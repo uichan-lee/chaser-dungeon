@@ -5,6 +5,7 @@ public enum RoomType {
     HORIZONTAL,
     VERTICAL,
     STARTING,
+    L,
     TREASURE,
     SPECIAL,
     // keep adding

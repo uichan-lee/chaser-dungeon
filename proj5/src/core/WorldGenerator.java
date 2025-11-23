@@ -31,12 +31,18 @@ public class WorldGenerator {
      * All floor tiles already used by rooms and corridors.
      */
     private final Set<Point> floorOccupied = new HashSet<>();
+    /**
+     * World positions of doors that successfully connected to another room.
+     */
+    private final Set<Point> connectedDoors = new HashSet<>();
 
     // Tunable parameters
     private static final int MIN_CORRIDOR_LEN = 3;
     private static final int MAX_CORRIDOR_LEN = 7;
     private static final int MAX_TURNS = 2;
-    private static final int MAX_EXPANSION_DEPTH = 12; // max recursion / room depth
+    private static final int MAX_EXPANSION_DEPTH = 99; // max recursion / room depth
+    private static final int MAX_TRIES_PER_DOOR = 5;
+
 
     public WorldGenerator(int width, int height, long seed) {
         this.width = width;
@@ -64,6 +70,9 @@ public class WorldGenerator {
 
         growFromRoom(start, 0);
 
+        // Update door tiles based on whether they're connected
+        updateDoorTiles();
+
         return world;
     }
 
@@ -83,6 +92,7 @@ public class WorldGenerator {
      *  Recursive expansion
      * ===================================================== */
 
+
     private void growFromRoom(Room room, int depth) {
         if (depth >= MAX_EXPANSION_DEPTH) {
             return;
@@ -92,35 +102,36 @@ public class WorldGenerator {
         for (Point doorWorld : doorWorlds) {
             Direction dir = directionForDoor(room, doorWorld);
 
-            // 1. Plan a corridor from this door in direction dir
-            CorridorResult corridor = buildRandomCorridorFrom(doorWorld, dir);
-            if (corridor == null) {
-                continue;
+            for (int attempt = 0; attempt < MAX_TRIES_PER_DOOR; attempt++) {
+                CorridorResult corridor = buildRandomCorridorFrom(doorWorld, dir);
+                if (corridor == null) {
+                    continue;  // Fail making door, another trial.
+                }
+
+                Direction neededDoorDir = corridor.lastDir.opposite();
+                List<RoomTemplate> candidates = RoomTemplates.BY_DIRECTION.get(neededDoorDir);
+                if (candidates == null || candidates.isEmpty()) {
+                    continue;
+                }
+
+                Room nextRoom = tryPlaceRandomRoomAtCorridorEnd(corridor, candidates, neededDoorDir);
+                if (nextRoom == null) {
+                    continue;
+                }
+
+                // Success → Mark both doors as connected
+                connectedDoors.add(new Point(doorWorld)); // Source door
+                connectedDoors.add(new Point(corridor.end)); // Destination door
+                
+                drawCorridor(corridor);
+                rooms.add(nextRoom);
+                drawRoom(nextRoom);
+                growFromRoom(nextRoom, depth + 1);
+                break;
             }
-
-            // 2. Determine what door direction the next room must have
-            Direction neededDoorDir = corridor.lastDir.opposite();
-            List<RoomTemplate> candidates = RoomTemplates.BY_DIRECTION.get(neededDoorDir);
-            if (candidates == null || candidates.isEmpty()) {
-                continue;
-            }
-
-            // 3. Try to place a random room at the end of the corridor
-            Room nextRoom = tryPlaceRandomRoomAtCorridorEnd(corridor, candidates, neededDoorDir);
-            if (nextRoom == null) {
-                // Dead-end is not committed at all
-                continue;
-            }
-
-            // 4. Corridor + room are valid → commit them
-            drawCorridor(corridor);
-            rooms.add(nextRoom);
-            drawRoom(nextRoom);
-
-            // 5. Recurse
-            growFromRoom(nextRoom, depth + 1);
         }
     }
+
 
     /**
      * Determine which side of the room this door is on,
@@ -338,13 +349,18 @@ public class WorldGenerator {
                 continue;
             }
 
-            // 2) doesn't overlap existing rooms
+            // 2) doesn't overlap existing rooms (bounding box check)
             if (candidate.overlapsAny(rooms)) {
                 continue;
             }
 
             // 3) doesn't overlap existing floor tiles
             if (!roomFloorsDisjoint(candidate)) {
+                continue;
+            }
+
+            // 4) doesn't overlap any non-NOTHING tiles (walls, floors, doors, etc.)
+            if (!roomTilesDisjoint(candidate)) {
                 continue;
             }
 
@@ -393,6 +409,49 @@ public class WorldGenerator {
         return true;
     }
 
+    /**
+     * Checks if the candidate room's non-NOTHING tiles don't overlap
+     * with any existing non-NOTHING tiles from placed rooms or the world.
+     * This prevents walls, floors, and doors from overlapping.
+     */
+    private boolean roomTilesDisjoint(Room room) {
+        for (int dx = 0; dx < room.template.width; dx++) {
+            for (int dy = 0; dy < room.template.height; dy++) {
+                TETile candidateTile = room.template.layout[dx][dy];
+                // Skip NOTHING tiles - they can overlap
+                if (candidateTile == Tileset.NOTHING) {
+                    continue;
+                }
+                
+                int worldX = room.worldX + dx;
+                int worldY = room.worldY + dy;
+                
+                // Check against existing rooms' tiles
+                for (Room existingRoom : rooms) {
+                    int localX = worldX - existingRoom.worldX;
+                    int localY = worldY - existingRoom.worldY;
+                    
+                    // Check if this world position is within the existing room's bounds
+                    if (localX >= 0 && localX < existingRoom.template.width &&
+                        localY >= 0 && localY < existingRoom.template.height) {
+                        TETile existingTile = existingRoom.template.layout[localX][localY];
+                        // If both tiles are non-NOTHING, they overlap
+                        if (existingTile != Tileset.NOTHING) {
+                            return false; // Overlap detected
+                        }
+                    }
+                }
+                
+                // Also check against what's already in the world (for corridors)
+                TETile worldTile = world[worldX][worldY];
+                if (worldTile != Tileset.NOTHING) {
+                    return false; // Overlap detected
+                }
+            }
+        }
+        return true;
+    }
+
     private void registerRoomFloors(Room room) {
         for (int dx = 0; dx < room.template.width; dx++) {
             for (int dy = 0; dy < room.template.height; dy++) {
@@ -408,6 +467,24 @@ public class WorldGenerator {
         room.drawInto(world);
         // If drawInto doesn't update floorOccupied,
         // registerRoomFloors(room) already did that on placement.
+    }
+
+    /**
+     * Updates all door tiles in the world:
+     * - Doors that are in connectedDoors become UNLOCKED_DOOR
+     * - Doors that are not in connectedDoors become LOCKED_DOOR
+     */
+    private void updateDoorTiles() {
+        for (Room room : rooms) {
+            List<Point> doorWorlds = room.getWorldDoorPositions();
+            for (Point doorWorld : doorWorlds) {
+                if (connectedDoors.contains(doorWorld)) {
+                    world[doorWorld.x][doorWorld.y] = Tileset.UNLOCKED_DOOR;
+                } else {
+                    world[doorWorld.x][doorWorld.y] = Tileset.LOCKED_DOOR;
+                }
+            }
+        }
     }
 
     /* =====================================================
