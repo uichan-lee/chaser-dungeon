@@ -25,17 +25,17 @@ public final class RoomTemplates {
     public static final Map<Direction, List<RoomTemplate>> BY_DIRECTION;
 
     static {
+        List<RoomTemplate> templates = new ArrayList<>();
 
         // ------------------------------------------------------------------
         // Register templates here
         // ------------------------------------------------------------------
+        templates.add(makeSimpleSquareRoom());
+        templates.add(makeHorizontalCorridorRoom());
+        templates.add(makeVerticalCorridorRoom());
         // TODO: add more interesting room shapes if desired.
 
-        ALL_TEMPLATES = List.of(
-                makeSimpleSquareRoom(),
-                makeHorizontalCorridorRoom(),
-                makeVerticalCorridorRoom()
-        );
+        ALL_TEMPLATES = Collections.unmodifiableList(templates);
 
         // Build direction index.
         Map<Direction, List<RoomTemplate>> byDir = new EnumMap<>(Direction.class);
@@ -63,11 +63,11 @@ public final class RoomTemplates {
 
     /**
      * Simple 5×5 square room with walls on the boundary and floor inside.
-     * Single door in the middle of the right wall.
+     * Single door on the middle of the right wall.
      */
     private static RoomTemplate makeSimpleSquareRoom() {
-        int w = 7;
-        int h = 7;
+        int w = 5;
+        int h = 5;
         TETile[][] layout = new TETile[w][h];
 
         // Fill with floor, then overwrite boundary with walls.
@@ -90,9 +90,8 @@ public final class RoomTemplates {
 
         List<Point> doors = List.of(door);
         Set<Direction> dirs = EnumSet.of(Direction.RIGHT);
-        Set<RoomType> roomTypes = EnumSet.of(RoomType.SQUARE);
 
-        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
+        return new RoomTemplate(w, h, layout, doors, dirs, RoomType.SQUARE);
     }
 
     /**
@@ -123,9 +122,8 @@ public final class RoomTemplates {
         Point rightDoor = new Point(w - 1, 1);
         List<Point> doors = List.of(leftDoor, rightDoor);
         Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT);
-        Set<RoomType> roomTypes = EnumSet.of(RoomType.HORIZONTAL);
 
-        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
+        return new RoomTemplate(w, h, layout, doors, dirs, RoomType.HORIZONTAL);
     }
 
     /**
@@ -156,57 +154,7 @@ public final class RoomTemplates {
         Point topDoor = new Point(1, h - 1);
         List<Point> doors = List.of(bottomDoor, topDoor);
         Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.UP);
-        Set<RoomType> roomTypes = EnumSet.of(RoomType.VERTICAL);
 
-        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
-    }
-
-    private static RoomTemplate makeStartingRoom() {
-
-    }
-
-    /* =====================================================
-     *  Helper methods
-     * ===================================================== */
-
-    /**
-     * Fill every tile in the layout with provided tile.
-     * Must be followed by {@link RoomTemplates}
-     */
-    private static void fill(TETile[][] layout, TETile tile) {
-        int w = layout.length;
-        int h = layout[0].length;
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                layout[x][y] = tile;
-            }
-        }
-    }
-
-
-    private static void addBoundaryWalls(TETile[][] layout, TETile wallTile) {
-        int w = layout.length;
-        int h = layout[0].length;
-
-        // Top + Bottom
-        for (int x = 0; x < w; x++) {
-            layout[x][0] = wallTile;
-            layout[x][h - 1] = wallTile;
-        }
-
-        // Left + Right
-        for (int y = 0; y < h; y++) {
-            layout[0][y] = wallTile;
-            layout[w - 1][y] = wallTile;
-        }
-    }
-
-    /**
-     * Add a room type to a given RoomTemplate
-     * @param roomTemplate
-     * @param rt
-     */
-    private static void addRoomType(RoomTemplate roomTemplate, RoomType rt) {
-        roomTemplate.roomTypes.add(rt);
+        return new RoomTemplate(w, h, layout, doors, dirs, RoomType.VERTICAL);
     }
 }
