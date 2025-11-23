@@ -37,7 +37,8 @@ public final class RoomTemplates {
         templates.add(makeBigHorizontalRoom());
         templates.add(makeSmallVerticalRoom());
         templates.add(makeBigVerticalRoom());
-        // TODO: add more interesting room shapes if desired.
+
+        // Keep adding more templates
 
         ALL_TEMPLATES = Collections.unmodifiableList(templates);
 
@@ -114,7 +115,7 @@ public final class RoomTemplates {
         Point door = new Point(w - 1, h / 2);
 
         List<Point> doors = List.of(door);
-        Set<Direction> dirs = EnumSet.of(Direction.RIGHT);
+        Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.SQUARE);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
@@ -124,7 +125,6 @@ public final class RoomTemplates {
      * [9, 9]
      * <p>
      * Simple 9×9 square room with walls on the boundary and floor inside.
-     * Single door in the middle of the right wall.
      */
     private static RoomTemplate makeBigSquareRoom() {
         int w = 11;
@@ -138,7 +138,7 @@ public final class RoomTemplates {
         Point door = new Point(w - 1, h / 2);
 
         List<Point> doors = List.of(door);
-        Set<Direction> dirs = EnumSet.of(Direction.RIGHT);
+        Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.SQUARE);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
