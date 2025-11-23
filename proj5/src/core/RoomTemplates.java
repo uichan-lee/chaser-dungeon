@@ -30,9 +30,13 @@ public final class RoomTemplates {
         // ------------------------------------------------------------------
         // Register templates here
         // ------------------------------------------------------------------
-        templates.add(makeSimpleSquareRoom());
-        templates.add(makeHorizontalCorridorRoom());
-        templates.add(makeVerticalCorridorRoom());
+        templates.add(makeStartingRoom());
+        templates.add(makeSmallSquareRoom());
+        templates.add(makeBigSquareRoom());
+        templates.add(makeSmallHorizontalRoom());
+        templates.add(makeBigHorizontalRoom());
+        templates.add(makeSmallVerticalRoom());
+        templates.add(makeBigVerticalRoom());
         // TODO: add more interesting room shapes if desired.
 
         ALL_TEMPLATES = Collections.unmodifiableList(templates);
@@ -54,24 +58,57 @@ public final class RoomTemplates {
         BY_DIRECTION = Collections.unmodifiableMap(byDir);
     }
 
-    /** Utility class; no instances allowed. */
-    private RoomTemplates() { }
+    /**
+     * Utility class; no instances allowed.
+     */
+    private RoomTemplates() {
+    }
 
     /* =====================================================
      *  Template definitions
      * ===================================================== */
 
     /**
-     * Simple 5×5 square room with walls on the boundary and floor inside.
-     * Single door in the middle of the right wall.
+     * A layout with width = w and height = h will have
+     * (w - 2) x (h - 2) tiles with wall borders
      */
-    private static RoomTemplate makeSimpleSquareRoom() {
+
+    /**
+     * [3, 3]
+     *
+     * Starting room uses 3x3 square.
+     * Every new game will start with player in this room.
+     */
+    private static RoomTemplate makeStartingRoom() {
         int w = 5;
         int h = 5;
         TETile[][] layout = new TETile[w][h];
 
         fill(layout, Tileset.FLOOR);
-        addBoundaryWalls(layout, Tileset.WALL);
+        addBoundaryWalls(layout);
+
+//        Point bottomDoor = new Point(1, 0);
+        Point topDoor = new Point();
+        List<Point> doors = List.of(topDoor);
+        Set<Direction> dirs = EnumSet.of(Direction.UP);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.STARTING);
+
+        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
+    }
+
+    /**
+     * [5, 5]
+     * <p>
+     * Simple 5×5 square room with walls on the boundary and floor inside.
+     * Single door in the middle of the right wall.
+     */
+    private static RoomTemplate makeSmallSquareRoom() {
+        int w = 7;
+        int h = 7;
+        TETile[][] layout = new TETile[w][h];
+
+        fill(layout, Tileset.FLOOR);
+        addBoundaryWalls(layout);
 
         // Door in the middle of the right wall.
         Point door = new Point(w - 1, h / 2);
@@ -84,15 +121,41 @@ public final class RoomTemplates {
     }
 
     /**
-     * Long horizontally oriented room/corridor with doors on left and right.
+     * [9, 9]
+     * <p>
+     * Simple 9×9 square room with walls on the boundary and floor inside.
+     * Single door in the middle of the right wall.
      */
-    private static RoomTemplate makeHorizontalCorridorRoom() {
-        int w = 7;
-        int h = 3;
+    private static RoomTemplate makeBigSquareRoom() {
+        int w = 11;
+        int h = 11;
         TETile[][] layout = new TETile[w][h];
 
         fill(layout, Tileset.FLOOR);
-        addBoundaryWalls(layout, Tileset.WALL);
+        addBoundaryWalls(layout);
+
+        // Door in the middle of the right wall.
+        Point door = new Point(w - 1, h / 2);
+
+        List<Point> doors = List.of(door);
+        Set<Direction> dirs = EnumSet.of(Direction.RIGHT);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.SQUARE);
+
+        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
+    }
+
+    /**
+     * [7, 3]
+     * <p>
+     * Long horizontally oriented room/corridor with doors on left and right.
+     */
+    private static RoomTemplate makeSmallHorizontalRoom() {
+        int w = 9;
+        int h = 5;
+        TETile[][] layout = new TETile[w][h];
+
+        fill(layout, Tileset.FLOOR);
+        addBoundaryWalls(layout);
 
         Point leftDoor = new Point(0, 1);
         Point rightDoor = new Point(w - 1, 1);
@@ -104,15 +167,40 @@ public final class RoomTemplates {
     }
 
     /**
-     * Long vertically oriented room/corridor with doors on bottom and top.
+     * [11, 5]
+     * <p>
+     * Long horizontally oriented room/corridor with doors on left and right.
      */
-    private static RoomTemplate makeVerticalCorridorRoom() {
-        int w = 3;
+    private static RoomTemplate makeBigHorizontalRoom() {
+        int w = 13;
         int h = 7;
         TETile[][] layout = new TETile[w][h];
 
         fill(layout, Tileset.FLOOR);
-        addBoundaryWalls(layout, Tileset.WALL);
+        addBoundaryWalls(layout);
+
+        Point leftDoor = new Point(0, 1);
+        Point rightDoor = new Point(w - 1, 1);
+        List<Point> doors = List.of(leftDoor, rightDoor);
+        Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.HORIZONTAL);
+
+        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
+    }
+
+
+    /**
+     * [3, 7]
+     * <p>
+     * Long vertically oriented room/corridor with doors on bottom and top.
+     */
+    private static RoomTemplate makeSmallVerticalRoom() {
+        int w = 5;
+        int h = 9;
+        TETile[][] layout = new TETile[w][h];
+
+        fill(layout, Tileset.FLOOR);
+        addBoundaryWalls(layout);
 
         Point bottomDoor = new Point(1, 0);
         Point topDoor = new Point(1, h - 1);
@@ -122,6 +210,30 @@ public final class RoomTemplates {
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
     }
+
+    /**
+     * [5, 11]
+     * <p>
+     * Long vertically oriented room/corridor with doors on bottom and top.
+     */
+    private static RoomTemplate makeBigVerticalRoom() {
+        int w = 7;
+        int h = 13;
+        TETile[][] layout = new TETile[w][h];
+
+        fill(layout, Tileset.FLOOR);
+        addBoundaryWalls(layout);
+
+        Point bottomDoor = new Point(1, 0);
+        Point topDoor = new Point(1, h - 1);
+        List<Point> doors = List.of(bottomDoor, topDoor);
+        Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.UP);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.VERTICAL);
+
+        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
+    }
+
+
 
     /* =====================================================
      *  Helper methods
@@ -142,20 +254,20 @@ public final class RoomTemplates {
     }
 
 
-    private static void addBoundaryWalls(TETile[][] layout, TETile wallTile) {
+    private static void addBoundaryWalls(TETile[][] layout) {
         int w = layout.length;
         int h = layout[0].length;
 
         // Top + Bottom
         for (int x = 0; x < w; x++) {
-            layout[x][0] = wallTile;
-            layout[x][h - 1] = wallTile;
+            layout[x][0] = Tileset.WALL;
+            layout[x][h - 1] = Tileset.WALL;
         }
 
         // Left + Right
         for (int y = 0; y < h; y++) {
-            layout[0][y] = wallTile;
-            layout[w - 1][y] = wallTile;
+            layout[0][y] = Tileset.WALL;
+            layout[w - 1][y] = Tileset.WALL;
         }
     }
 
