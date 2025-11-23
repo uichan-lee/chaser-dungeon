@@ -68,6 +68,11 @@ public class WorldGenerator {
         rooms.add(start);
         drawRoom(start);
 
+        // Place avatar in the center of the starting room
+        int avatarX = start.worldX + start.template.width / 2;
+        int avatarY = start.worldY + start.template.height / 2;
+        world[avatarX][avatarY] = Tileset.AVATAR;
+
         growFromRoom(start, 0);
 
         // Update door tiles based on whether they're connected
@@ -77,12 +82,13 @@ public class WorldGenerator {
     }
 
     /**
-     * Place the starting room at (1, 1). Assumes template 0 is STARTING.
+     * Place the starting room in the center of the world. Assumes template 0 is STARTING.
      */
     private Room placeStartingRoom() {
         RoomTemplate t = RoomTemplates.ALL_TEMPLATES.get(0); // makeStartingRoom()
-        int worldX = 1;
-        int worldY = 1;
+        // Center the room in the world
+        int worldX = (width - t.width) / 2;
+        int worldY = (height - t.height) / 2;
         Room r = new Room(t, worldX, worldY);
         registerRoomFloors(r);
         return r;

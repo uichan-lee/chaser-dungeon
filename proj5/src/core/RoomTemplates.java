@@ -94,18 +94,20 @@ public final class RoomTemplates {
         int h = 5;
         TETile[][] layout = new TETile[w][h];
 
-        fill(layout, Tileset.FLOOR);
+        fill(layout, Tileset.SAND);
         addBoundaryWalls(layout);
 
-        // Door in the middle of the top wall.
-        Point topDoor = new Point(w / 2, h - 1); // (2, 4)
-        Point rightDoor = new Point(w - 1, h / 2);
-        List<Point> doors = List.of(topDoor, rightDoor);
+        // Doors on all 4 sides
+        Point topDoor = new Point(w / 2, h - 1);      // (2, 4) - top
+        Point bottomDoor = new Point(w / 2, 0);       // (2, 0) - bottom
+        Point leftDoor = new Point(0, h / 2);         // (0, 2) - left
+        Point rightDoor = new Point(w - 1, h / 2);    // (4, 2) - right
+        List<Point> doors = List.of(topDoor, bottomDoor, leftDoor, rightDoor);
         for (Point door : doors) {
             layout[door.x][door.y] = Tileset.LOCKED_DOOR;
         }
 
-        Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.RIGHT);
+        Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.STARTING);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
