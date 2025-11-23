@@ -63,35 +63,24 @@ public final class RoomTemplates {
 
     /**
      * Simple 5×5 square room with walls on the boundary and floor inside.
-     * Single door on the middle of the right wall.
+     * Single door in the middle of the right wall.
      */
     private static RoomTemplate makeSimpleSquareRoom() {
         int w = 5;
         int h = 5;
         TETile[][] layout = new TETile[w][h];
 
-        // Fill with floor, then overwrite boundary with walls.
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
-        for (int x = 0; x < w; x++) {
-            layout[x][0] = Tileset.WALL;
-            layout[x][h - 1] = Tileset.WALL;
-        }
-        for (int y = 0; y < h; y++) {
-            layout[0][y] = Tileset.WALL;
-            layout[w - 1][y] = Tileset.WALL;
-        }
+        fill(layout, Tileset.FLOOR);
+        addBoundaryWalls(layout, Tileset.WALL);
 
         // Door in the middle of the right wall.
         Point door = new Point(w - 1, h / 2);
 
         List<Point> doors = List.of(door);
         Set<Direction> dirs = EnumSet.of(Direction.RIGHT);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.SQUARE);
 
-        return new RoomTemplate(w, h, layout, doors, dirs, RoomType.SQUARE);
+        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
     }
 
     /**
@@ -102,28 +91,16 @@ public final class RoomTemplates {
         int h = 3;
         TETile[][] layout = new TETile[w][h];
 
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
-        // Top and bottom walls.
-        for (int x = 0; x < w; x++) {
-            layout[x][0] = Tileset.WALL;
-            layout[x][h - 1] = Tileset.WALL;
-        }
-        // Side walls.
-        for (int y = 0; y < h; y++) {
-            layout[0][y] = Tileset.WALL;
-            layout[w - 1][y] = Tileset.WALL;
-        }
+        fill(layout, Tileset.FLOOR);
+        addBoundaryWalls(layout, Tileset.WALL);
 
         Point leftDoor = new Point(0, 1);
         Point rightDoor = new Point(w - 1, 1);
         List<Point> doors = List.of(leftDoor, rightDoor);
         Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.HORIZONTAL);
 
-        return new RoomTemplate(w, h, layout, doors, dirs, RoomType.HORIZONTAL);
+        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
     }
 
     /**
@@ -134,27 +111,59 @@ public final class RoomTemplates {
         int h = 7;
         TETile[][] layout = new TETile[w][h];
 
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
-        // Left and right walls.
-        for (int y = 0; y < h; y++) {
-            layout[0][y] = Tileset.WALL;
-            layout[w - 1][y] = Tileset.WALL;
-        }
-        // Top and bottom walls.
-        for (int x = 0; x < w; x++) {
-            layout[x][0] = Tileset.WALL;
-            layout[x][h - 1] = Tileset.WALL;
-        }
+        fill(layout, Tileset.FLOOR);
+        addBoundaryWalls(layout, Tileset.WALL);
 
         Point bottomDoor = new Point(1, 0);
         Point topDoor = new Point(1, h - 1);
         List<Point> doors = List.of(bottomDoor, topDoor);
         Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.UP);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.VERTICAL);
 
-        return new RoomTemplate(w, h, layout, doors, dirs, RoomType.VERTICAL);
+        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
     }
+
+    /* =====================================================
+     *  Helper methods
+     * ===================================================== */
+
+    /**
+     * Fill every tile in the layout with provided tile.
+     * Must be followed by {@link RoomTemplates}
+     */
+    private static void fill(TETile[][] layout, TETile tile) {
+        int w = layout.length;
+        int h = layout[0].length;
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                layout[x][y] = tile;
+            }
+        }
+    }
+
+
+    private static void addBoundaryWalls(TETile[][] layout, TETile wallTile) {
+        int w = layout.length;
+        int h = layout[0].length;
+
+        // Top + Bottom
+        for (int x = 0; x < w; x++) {
+            layout[x][0] = wallTile;
+            layout[x][h - 1] = wallTile;
+        }
+
+        // Left + Right
+        for (int y = 0; y < h; y++) {
+            layout[0][y] = wallTile;
+            layout[w - 1][y] = wallTile;
+        }
+    }
+
+    /**
+     * Add a room type to a given RoomTemplate
+     */
+    private static void addRoomType(RoomTemplate roomTemplate, RoomType rt) {
+        roomTemplate.roomTypes.add(rt);
+    }
+
 }
