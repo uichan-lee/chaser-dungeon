@@ -1,6 +1,26 @@
 package core;
 
-public class World {
+import tileengine.TERenderer;
+import tileengine.TETile;
+import tileengine.Tileset;
 
-    // build your own world!
+import java.util.List;
+
+public class World {
+    private static final int WIDTH = 30;
+    private static final int HEIGHT = 30;
+    private static final List<RoomTemplate> ROOM_TEMPLATES = RoomTemplates.ALL_TEMPLATES;
+
+    public static void main(String[] args) {
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+
+        long seed = 12345L; // Update needed
+        WorldGenerator gen = new WorldGenerator(WIDTH, HEIGHT, seed);
+        TETile[][] world = gen.generate();
+
+        ter.renderFrame(world);
+    }
+
 }
+

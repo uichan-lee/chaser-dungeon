@@ -18,7 +18,7 @@ public enum Direction {
     /**
      * Return opposite direction
      */
-    public Direction opoosite() {
+    public Direction opposite() {
         switch (this) {
             case UP:
                 return DOWN;
