@@ -5,11 +5,10 @@ import tileengine.TETile;
 import tileengine.Tileset;
 
 import java.util.List;
-import core.WorldGenerator;
 
 public class World {
-    private static final int WIDTH = 140;
-    private static final int HEIGHT = 70;
+    private static final int WIDTH = 100;
+    private static final int HEIGHT = 60;
     private static final List<RoomTemplate> ROOM_TEMPLATES = RoomTemplates.ALL_TEMPLATES;
 
     public static void main(String[] args) {

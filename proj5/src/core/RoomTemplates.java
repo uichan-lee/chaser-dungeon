@@ -30,23 +30,41 @@ public final class RoomTemplates {
         /* =====================================================
          *  Templates
          * ===================================================== */
+        // Starting room
         templates.add(makeStartingRoom());
+
+        // Square rooms
         templates.add(makeSmallSquareRoom());
         templates.add(makeBigSquareRoom());
+
+        // Horizontal rooms
         templates.add(makeSmallHorizontalRoom());
         templates.add(makeBigHorizontalRoom());
+
+        // Vertical rooms
         templates.add(makeSmallVerticalRoom());
         templates.add(makeBigVerticalRoom());
 
+        // Small L-shaped rooms
         templates.add(makeSmallLRoom());
         templates.add(makeSmallLRoomMirroredH());
         templates.add(makeSmallLRoomMirroredV());
         templates.add(makeSmallLRoomRotated180());
-        
+
+        // Big L-shaped rooms
         templates.add(makeBigLRoom());
         templates.add(makeBigLRoomMirroredH());
         templates.add(makeBigLRoomMirroredV());
         templates.add(makeBigLRoomRotated180());
+
+        // Ring shaped rooms
+        // Small ring-shaped rooms
+        templates.add(makeSmallSquareThinRingRoom());
+
+        // Big ring-shaped rooms
+        // TODO: Implement makeBigSquareRingRoom()
+        // templates.add(makeBigSquareRingRoom());
+
 
         // Keep adding more templates
 
@@ -103,9 +121,7 @@ public final class RoomTemplates {
         Point leftDoor = new Point(0, h / 2);         // (0, 2) - left
         Point rightDoor = new Point(w - 1, h / 2);    // (4, 2) - right
         List<Point> doors = List.of(topDoor, bottomDoor, leftDoor, rightDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.STARTING);
@@ -134,9 +150,7 @@ public final class RoomTemplates {
         Point topDoor = new Point(w / 2, h - 1);       // top wall center
 
         List<Point> doors = List.of(leftDoor, rightDoor, bottomDoor, topDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.SQUARE);
@@ -164,9 +178,7 @@ public final class RoomTemplates {
         Point topDoor = new Point(w / 2, h - 1);       // top wall center
 
         List<Point> doors = List.of(leftDoor, rightDoor, bottomDoor, topDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.SQUARE);
@@ -176,7 +188,7 @@ public final class RoomTemplates {
 
     /**
      * [7, 3]
-     * Long horizontally oriented room/corridor with doors on left and right.
+     * Long horizontally oriented room/corridor with doors on left, right, and top.
      */
     private static RoomTemplate makeSmallHorizontalRoom() {
         int w = 9;
@@ -188,21 +200,21 @@ public final class RoomTemplates {
 
         // Doors centered vertically on left and right walls.
         Point leftDoor = new Point(0, h / 2);        // (0, 2)
-        Point rightDoor = new Point(w - 1, h / 2);   // (8, 2)
-        List<Point> doors = List.of(leftDoor, rightDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        Point rightDoor = new Point(w - 1, h / 2);      // (8, 2)
+        Point topDoor = new Point(w / 2, h - 1);        // (4, 4)
+        List<Point> doors = List.of(leftDoor, rightDoor, topDoor);
+        drawLockedDoors(doors, layout);
 
-        Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT);
+        Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT, Direction.UP);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.HORIZONTAL);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
     }
 
+
     /**
      * [11, 5]
-     * Long horizontally oriented room/corridor with doors on left and right.
+     * Long horizontally oriented room/corridor with doors on left, right, and bottom.
      */
     private static RoomTemplate makeBigHorizontalRoom() {
         int w = 13;
@@ -215,12 +227,11 @@ public final class RoomTemplates {
         // Doors centered vertically on left and right walls.
         Point leftDoor = new Point(0, h / 2);        // (0, 3)
         Point rightDoor = new Point(w - 1, h / 2);   // (12, 3)
-        List<Point> doors = List.of(leftDoor, rightDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        Point bottomDoor = new Point(w / 2, 0);      // (6, 0)
+        List<Point> doors = List.of(leftDoor, rightDoor, bottomDoor);
+        drawLockedDoors(doors, layout);
 
-        Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT);
+        Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT, Direction.DOWN);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.HORIZONTAL);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
@@ -243,9 +254,7 @@ public final class RoomTemplates {
         Point bottomDoor = new Point(w / 2, 0);      // (2, 0)
         Point topDoor = new Point(w / 2, h - 1);     // (2, 8)
         List<Point> doors = List.of(bottomDoor, topDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.UP);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.VERTICAL);
@@ -269,9 +278,7 @@ public final class RoomTemplates {
         Point bottomDoor = new Point(w / 2, 0);      // (3, 0)
         Point topDoor = new Point(w / 2, h - 1);     // (3, 12)
         List<Point> doors = List.of(bottomDoor, topDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.UP);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.VERTICAL);
@@ -287,7 +294,7 @@ public final class RoomTemplates {
      * - Vertical leg:  x=1..3, y=1..6
      * - Horizontal leg:  x=1..6, y=1..3
      * => Upper Right 3 x 3 becomes NOTHING
-     *
+     * <p>
      * Doors: (2,7) [UP], (7,2) [RIGHT]
      */
     private static RoomTemplate makeSmallLRoom() {
@@ -295,55 +302,22 @@ public final class RoomTemplates {
         int h = 8;
         TETile[][] layout = new TETile[w][h];
 
-        // 1) Fill All with NOTHING
         fill(layout, Tileset.NOTHING);
 
-        // 2) Vertical leg
-        for (int x = 1; x <= 3; x++) {
-            for (int y = 1; y <= 6; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Vertical leg: x=1..3, y=1..6 (width=3, height=6)
+        fillRect(layout, 1, 1, 3, 6, Tileset.FLOOR);
 
-        // 3) Horizontal leg
-        for (int x = 1; x <= 6; x++) {
-            for (int y = 1; y <= 3; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Horizontal leg: x=1..6, y=1..3 (width=6, height=3)
+        fillRect(layout, 1, 1, 6, 3, Tileset.FLOOR);
 
-        // 4) Border WALL
-        // Top + Bottom
-        for (int x = 0; x < w; x++) {
-            layout[x][0] = Tileset.WALL;
+        // Add walls around floor tiles
+        addWallsAroundFloor(layout);
 
-            if (x <= 4) {
-                layout[x][7] = Tileset.WALL;
-            }
-            if (x >= 4) {
-                layout[x][4] = Tileset.WALL;
-            }
-        }
-
-        // Left + Right
-        for (int y = 0; y < h; y++) {
-            layout[0][y] = Tileset.WALL;
-
-            if (y <= 4) {
-                layout[7][y] = Tileset.WALL;
-            }
-            if (y >= 4) {
-                layout[4][y] = Tileset.WALL;
-            }
-        }
-
-        // 5) Door positions (LEFT / RIGHT)
-        Point upperLeftDoor  = new Point(2, 7);  // Middle of upper wall
+        // Door positions
+        Point upperLeftDoor = new Point(2, 7);  // Middle of upper wall
         Point lowerRightDoor = new Point(7, 2);  // Middle of right wall
         List<Point> doors = List.of(upperLeftDoor, lowerRightDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.RIGHT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L);
@@ -353,66 +327,39 @@ public final class RoomTemplates {
 
     /**
      * Large L-shaped room – thicker version of {@link #makeSmallLRoom()}.
-     *
+     * <p>
      * Whole box: 12 x 12 (including walls).
      * Interior coordinates: x = 1..10, y = 1..10.
-     *   - Vertical leg:   x = 1..5,  y = 1..10
-     *   - Horizontal leg: x = 1..10, y = 1..5
+     * - Vertical leg:   x = 1..5,  y = 1..10
+     * - Horizontal leg: x = 1..10, y = 1..5
      * So the upper-right 5 x 5 interior (x = 6..10, y = 6..10) stays NOTHING,
      * giving an L of thickness 5.
-     *
+     * <p>
      * Doors:
-     *   - (3, 11): top side, centered on the vertical leg  → Direction.UP
-     *   - (11, 3): right side, centered on the horizontal leg → Direction.RIGHT
+     * - (3, 11): top side, centered on the vertical leg  → Direction.UP
+     * - (11, 3): right side, centered on the horizontal leg → Direction.RIGHT
      */
     private static RoomTemplate makeBigLRoom() {
         int w = 12;
         int h = 12;
         TETile[][] layout = new TETile[w][h];
 
-        // Start with all NOTHING.
         fill(layout, Tileset.NOTHING);
 
-        // Vertical leg: x = 1..5, y = 1..10
-        for (int x = 1; x <= 5; x++) {
-            for (int y = 1; y <= 10; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Vertical leg: x = 1..5, y = 1..10 (width=5, height=10)
+        fillRect(layout, 1, 1, 5, 10, Tileset.FLOOR);
 
-        // Horizontal leg: x = 1..10, y = 1..5
-        for (int x = 1; x <= 10; x++) {
-            for (int y = 1; y <= 5; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Horizontal leg: x = 1..10, y = 1..5 (width=10, height=5)
+        fillRect(layout, 1, 1, 10, 5, Tileset.FLOOR);
 
-        // Add walls around the L-shaped floor region:
-        // any NOTHING tile that is 4-neighbor to a FLOOR tile becomes WALL.
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                if (layout[x][y] == Tileset.FLOOR) {
-                    for (Direction d : Direction.values()) {
-                        int nx = x + d.dx;
-                        int ny = y + d.dy;
-                        if (nx < 0 || nx >= w || ny < 0 || ny >= h) {
-                            continue;
-                        }
-                        if (layout[nx][ny] == Tileset.NOTHING) {
-                            layout[nx][ny] = Tileset.WALL;
-                        }
-                    }
-                }
-            }
-        }
+        // Add walls around the L-shaped floor region
+        addWallsAroundFloor(layout);
 
         // Doors on the top and right sides.
-        Point upperLeftDoor  = new Point(3, 11);
+        Point upperLeftDoor = new Point(3, 11);
         Point lowerRightDoor = new Point(11, 3);
         List<Point> doors = List.of(upperLeftDoor, lowerRightDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.RIGHT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L);
@@ -432,44 +379,19 @@ public final class RoomTemplates {
 
         fill(layout, Tileset.NOTHING);
 
-        // Vertical leg on right: x=4..6, y=1..6
-        for (int x = 4; x <= 6; x++) {
-            for (int y = 1; y <= 6; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Vertical leg on right: x=4..6, y=1..6 (width=3, height=6)
+        fillRect(layout, 4, 1, 3, 6, Tileset.FLOOR);
 
-        // Horizontal leg on bottom: x=1..6, y=1..3
-        for (int x = 1; x <= 6; x++) {
-            for (int y = 1; y <= 3; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Horizontal leg on bottom: x=1..6, y=1..3 (width=6, height=3)
+        fillRect(layout, 1, 1, 6, 3, Tileset.FLOOR);
 
         // Add walls around the L-shaped floor region
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                if (layout[x][y] == Tileset.FLOOR) {
-                    for (Direction d : Direction.values()) {
-                        int nx = x + d.dx;
-                        int ny = y + d.dy;
-                        if (nx < 0 || nx >= w || ny < 0 || ny >= h) {
-                            continue;
-                        }
-                        if (layout[nx][ny] == Tileset.NOTHING) {
-                            layout[nx][ny] = Tileset.WALL;
-                        }
-                    }
-                }
-            }
-        }
+        addWallsAroundFloor(layout);
 
         Point upperRightDoor = new Point(5, 7);
         Point lowerLeftDoor = new Point(0, 2);
         List<Point> doors = List.of(upperRightDoor, lowerLeftDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.LEFT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L);
@@ -489,44 +411,19 @@ public final class RoomTemplates {
 
         fill(layout, Tileset.NOTHING);
 
-        // Vertical leg on left: x=1..3, y=1..6
-        for (int x = 1; x <= 3; x++) {
-            for (int y = 1; y <= 6; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Vertical leg on left: x=1..3, y=1..6 (width=3, height=6)
+        fillRect(layout, 1, 1, 3, 6, Tileset.FLOOR);
 
-        // Horizontal leg on top: x=1..6, y=4..6
-        for (int x = 1; x <= 6; x++) {
-            for (int y = 4; y <= 6; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Horizontal leg on top: x=1..6, y=4..6 (width=6, height=3)
+        fillRect(layout, 1, 4, 6, 3, Tileset.FLOOR);
 
         // Add walls around the L-shaped floor region
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                if (layout[x][y] == Tileset.FLOOR) {
-                    for (Direction d : Direction.values()) {
-                        int nx = x + d.dx;
-                        int ny = y + d.dy;
-                        if (nx < 0 || nx >= w || ny < 0 || ny >= h) {
-                            continue;
-                        }
-                        if (layout[nx][ny] == Tileset.NOTHING) {
-                            layout[nx][ny] = Tileset.WALL;
-                        }
-                    }
-                }
-            }
-        }
+        addWallsAroundFloor(layout);
 
         Point lowerLeftDoor = new Point(2, 0);
         Point upperRightDoor = new Point(7, 5);
         List<Point> doors = List.of(lowerLeftDoor, upperRightDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.RIGHT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L);
@@ -546,44 +443,19 @@ public final class RoomTemplates {
 
         fill(layout, Tileset.NOTHING);
 
-        // Vertical leg on right: x=4..6, y=1..6
-        for (int x = 4; x <= 6; x++) {
-            for (int y = 1; y <= 6; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Vertical leg on right: x=4..6, y=1..6 (width=3, height=6)
+        fillRect(layout, 4, 1, 3, 6, Tileset.FLOOR);
 
-        // Horizontal leg on top: x=1..6, y=4..6
-        for (int x = 1; x <= 6; x++) {
-            for (int y = 4; y <= 6; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Horizontal leg on top: x=1..6, y=4..6 (width=6, height=3)
+        fillRect(layout, 1, 4, 6, 3, Tileset.FLOOR);
 
         // Add walls around the L-shaped floor region
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                if (layout[x][y] == Tileset.FLOOR) {
-                    for (Direction d : Direction.values()) {
-                        int nx = x + d.dx;
-                        int ny = y + d.dy;
-                        if (nx < 0 || nx >= w || ny < 0 || ny >= h) {
-                            continue;
-                        }
-                        if (layout[nx][ny] == Tileset.NOTHING) {
-                            layout[nx][ny] = Tileset.WALL;
-                        }
-                    }
-                }
-            }
-        }
+        addWallsAroundFloor(layout);
 
         Point lowerRightDoor = new Point(5, 0);
         Point upperLeftDoor = new Point(0, 5);
         List<Point> doors = List.of(lowerRightDoor, upperLeftDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.LEFT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L);
@@ -603,44 +475,19 @@ public final class RoomTemplates {
 
         fill(layout, Tileset.NOTHING);
 
-        // Vertical leg on right: x = 6..10, y = 1..10
-        for (int x = 6; x <= 10; x++) {
-            for (int y = 1; y <= 10; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Vertical leg on right: x = 6..10, y = 1..10 (width=5, height=10)
+        fillRect(layout, 6, 1, 5, 10, Tileset.FLOOR);
 
-        // Horizontal leg on bottom: x = 1..10, y = 1..5
-        for (int x = 1; x <= 10; x++) {
-            for (int y = 1; y <= 5; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Horizontal leg on bottom: x = 1..10, y = 1..5 (width=10, height=5)
+        fillRect(layout, 1, 1, 10, 5, Tileset.FLOOR);
 
         // Add walls around the L-shaped floor region
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                if (layout[x][y] == Tileset.FLOOR) {
-                    for (Direction d : Direction.values()) {
-                        int nx = x + d.dx;
-                        int ny = y + d.dy;
-                        if (nx < 0 || nx >= w || ny < 0 || ny >= h) {
-                            continue;
-                        }
-                        if (layout[nx][ny] == Tileset.NOTHING) {
-                            layout[nx][ny] = Tileset.WALL;
-                        }
-                    }
-                }
-            }
-        }
+        addWallsAroundFloor(layout);
 
         Point upperRightDoor = new Point(8, 11);
         Point lowerLeftDoor = new Point(0, 3);
         List<Point> doors = List.of(upperRightDoor, lowerLeftDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.LEFT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L);
@@ -660,44 +507,19 @@ public final class RoomTemplates {
 
         fill(layout, Tileset.NOTHING);
 
-        // Vertical leg on left: x = 1..5, y = 1..10
-        for (int x = 1; x <= 5; x++) {
-            for (int y = 1; y <= 10; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Vertical leg on left: x = 1..5, y = 1..10 (width=5, height=10)
+        fillRect(layout, 1, 1, 5, 10, Tileset.FLOOR);
 
-        // Horizontal leg on top: x = 1..10, y = 6..10
-        for (int x = 1; x <= 10; x++) {
-            for (int y = 6; y <= 10; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Horizontal leg on top: x = 1..10, y = 6..10 (width=10, height=5)
+        fillRect(layout, 1, 6, 10, 5, Tileset.FLOOR);
 
         // Add walls around the L-shaped floor region
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                if (layout[x][y] == Tileset.FLOOR) {
-                    for (Direction d : Direction.values()) {
-                        int nx = x + d.dx;
-                        int ny = y + d.dy;
-                        if (nx < 0 || nx >= w || ny < 0 || ny >= h) {
-                            continue;
-                        }
-                        if (layout[nx][ny] == Tileset.NOTHING) {
-                            layout[nx][ny] = Tileset.WALL;
-                        }
-                    }
-                }
-            }
-        }
+        addWallsAroundFloor(layout);
 
         Point lowerLeftDoor = new Point(3, 0);
         Point upperRightDoor = new Point(11, 8);
         List<Point> doors = List.of(lowerLeftDoor, upperRightDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.RIGHT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L);
@@ -717,46 +539,49 @@ public final class RoomTemplates {
 
         fill(layout, Tileset.NOTHING);
 
-        // Vertical leg on right: x = 6..10, y = 1..10
-        for (int x = 6; x <= 10; x++) {
-            for (int y = 1; y <= 10; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Vertical leg on right: x = 6..10, y = 1..10 (width=5, height=10)
+        fillRect(layout, 6, 1, 5, 10, Tileset.FLOOR);
 
-        // Horizontal leg on top: x = 1..10, y = 6..10
-        for (int x = 1; x <= 10; x++) {
-            for (int y = 6; y <= 10; y++) {
-                layout[x][y] = Tileset.FLOOR;
-            }
-        }
+        // Horizontal leg on top: x = 1..10, y = 6..10 (width=10, height=5)
+        fillRect(layout, 1, 6, 10, 5, Tileset.FLOOR);
 
         // Add walls around the L-shaped floor region
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                if (layout[x][y] == Tileset.FLOOR) {
-                    for (Direction d : Direction.values()) {
-                        int nx = x + d.dx;
-                        int ny = y + d.dy;
-                        if (nx < 0 || nx >= w || ny < 0 || ny >= h) {
-                            continue;
-                        }
-                        if (layout[nx][ny] == Tileset.NOTHING) {
-                            layout[nx][ny] = Tileset.WALL;
-                        }
-                    }
-                }
-            }
-        }
+        addWallsAroundFloor(layout);
 
         Point lowerRightDoor = new Point(8, 0);
         Point upperLeftDoor = new Point(0, 8);
         List<Point> doors = List.of(lowerRightDoor, upperLeftDoor);
-        for (Point door : doors) {
-            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
-        }
+        drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.LEFT);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.L);
+
+        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
+    }
+
+    /**
+     * Small square thin ring-shaped (donut-shaped) room
+     * Have one empty space surrounded by wall (total 3 X 3 occupied) in the middle.
+     * <p>
+     * Doors: (0, 3) [LEFT], (6, 3) [RIGHT], (3, 6) [UP], (3, 0) [DOWN]
+     */
+    private static RoomTemplate makeSmallSquareThinRingRoom() {
+        int w = 7;
+        int h = 7;
+        TETile[][] layout = new TETile[w][h];
+
+        fill(layout, Tileset.NOTHING);
+
+        // Fill outer layer will wall
+
+        Point leftDoor = new Point(0, 3);
+        Point rightDoor = new Point(6, 3);
+        Point topDoor = new Point(3, 6);
+        Point bottomDoor = new Point(3, 0);
+        List<Point> doors = List.of(leftDoor, rightDoor, topDoor, bottomDoor);
+        drawLockedDoors(doors, layout);
+
+        Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
@@ -782,6 +607,107 @@ public final class RoomTemplates {
         }
     }
 
+    /**
+     * Fill a rectangular area in the layout with the provided tile.
+     * 
+     * @param layout The layout to modify
+     * @param startX Starting x coordinate (inclusive)
+     * @param startY Starting y coordinate (inclusive)
+     * @param width Width of the rectangle
+     * @param height Height of the rectangle
+     * @param tile The tile to fill with
+     */
+    private static void fillRect(TETile[][] layout, int startX, int startY, int width, int height, TETile tile) {
+        int w = layout.length;
+        int h = layout[0].length;
+        for (int x = startX; x < startX + width && x < w; x++) {
+            for (int y = startY; y < startY + height && y < h; y++) {
+                if (x >= 0 && y >= 0) {
+                    layout[x][y] = tile;
+                }
+            }
+        }
+    }
+
+    /**
+     * Create a diamond shape in the layout centered at the given position.
+     * The length parameter determines the size: if length=2, the diamond will have
+     * 4 vertical and horizontal length (area is 4 * 4 / 2 = 8).
+     * 
+     * @param layout The layout to modify
+     * @param centerX Center x coordinate
+     * @param centerY Center y coordinate
+     * @param length The length parameter (diamond extends length units in each direction)
+     * @param tile The tile to fill with
+     */
+    private static void createDiamond(TETile[][] layout, int centerX, int centerY, int length, TETile tile) {
+        int w = layout.length;
+        int h = layout[0].length;
+        
+        for (int dx = -length; dx <= length; dx++) {
+            for (int dy = -length; dy <= length; dy++) {
+                if (Math.abs(dx) + Math.abs(dy) <= length) {
+                    int x = centerX + dx;
+                    int y = centerY + dy;
+                    if (x >= 0 && x < w && y >= 0 && y < h) {
+                        layout[x][y] = tile;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Create a ring (donut) shape in the layout.
+     * Fills the area between innerRadius and outerRadius from the center.
+     * 
+     * @param layout The layout to modify
+     * @param centerX Center x coordinate
+     * @param centerY Center y coordinate
+     * @param innerRadius Inner radius (exclusive - this area stays unchanged)
+     * @param outerRadius Outer radius (inclusive - fills up to this distance)
+     * @param tile The tile to fill with
+     */
+    private static void fillRing(TETile[][] layout, int centerX, int centerY, int innerRadius, int outerRadius, TETile tile) {
+        int w = layout.length;
+        int h = layout[0].length;
+        
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                int dx = x - centerX;
+                int dy = y - centerY;
+                int dist = Math.max(Math.abs(dx), Math.abs(dy)); // Chebyshev distance for square rings
+                if (dist > innerRadius && dist <= outerRadius) {
+                    layout[x][y] = tile;
+                }
+            }
+        }
+    }
+
+    /**
+     * Add walls around all floor tiles in the layout.
+     * Any NOTHING tile that is a 4-neighbor to a FLOOR tile becomes WALL.
+     */
+    private static void addWallsAroundFloor(TETile[][] layout) {
+        int w = layout.length;
+        int h = layout[0].length;
+        
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                if (layout[x][y] == Tileset.FLOOR) {
+                    for (Direction d : Direction.values()) {
+                        int nx = x + d.dx;
+                        int ny = y + d.dy;
+                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                            if (layout[nx][ny] == Tileset.NOTHING) {
+                                layout[nx][ny] = Tileset.WALL;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private static void addBoundaryWalls(TETile[][] layout) {
         int w = layout.length;
@@ -797,6 +723,12 @@ public final class RoomTemplates {
         for (int y = 0; y < h; y++) {
             layout[0][y] = Tileset.WALL;
             layout[w - 1][y] = Tileset.WALL;
+        }
+    }
+
+    private static void drawLockedDoors(List<Point> doors, TETile[][] layout) {
+        for (Point door : doors) {
+            layout[door.x][door.y] = Tileset.LOCKED_DOOR;
         }
     }
 
