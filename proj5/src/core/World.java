@@ -5,6 +5,7 @@ import tileengine.TETile;
 import tileengine.Tileset;
 
 import java.util.List;
+import core.WorldGenerator;
 
 public class World {
     private static final int WIDTH = 140;
