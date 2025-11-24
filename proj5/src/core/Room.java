@@ -1,6 +1,7 @@
 package core;
 
 import tileengine.TETile;
+import tileengine.Tileset;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -78,17 +79,17 @@ public class Room {
     /**
      * Checks whether this room fits entirely within the world bounds.
      * World coordinates are assumed to be valid in
-     * {@code [0, worldWidth)} × {@code [0, worldHeight)}.
+     * {@code [1, worldWidth - 1)} × {@code [1, worldHeight - 1)}.
      *
      * @param worldWidth  total world width
      * @param worldHeight total world height
      * @return true if every tile of this room lies inside the bounds
      */
     public boolean fitsWithinWorld(int worldWidth, int worldHeight) {
-        return worldX >= 0
-                && worldY >= 0
-                && maxX() <= worldWidth
-                && maxY() <= worldHeight;
+        return worldX >= 1
+                && worldY >= 1
+                && maxX() <= worldWidth - 1
+                && maxY() <= worldHeight - 1;
     }
 
     /**
@@ -133,8 +134,33 @@ public class Room {
         for (int dx = 0; dx < template.width; dx++) {
             for (int dy = 0; dy < template.height; dy++) {
                 TETile tile = template.layout[dx][dy];
-                world[worldX + dx][worldY + dy] = tile;
+                int x = worldX + dx;
+                int y = worldY + dy;
+                TETile existing = world[x][y];
+
+                if (tile == Tileset.NOTHING) {
+                    continue;
+                }
+
+                if (existing == Tileset.NOTHING) {
+                    world[x][y] = tile;
+                    continue;
+                }
+
+                if (canOverwrite(existing, tile)) {
+                    world[x][y] = tile;
+                }
             }
         }
+    }
+
+    private boolean canOverwrite(TETile existing, TETile incoming) {
+        if (existing == Tileset.WALL && incoming != Tileset.NOTHING) {
+            return true;
+        }
+        if (incoming == Tileset.LOCKED_DOOR || incoming == Tileset.UNLOCKED_DOOR) {
+            return existing == Tileset.FLOOR;
+        }
+        return false;
     }
 }

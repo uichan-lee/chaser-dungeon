@@ -38,7 +38,7 @@ public class WorldGenerator {
 
     // Tunable parameters
     private static final int MIN_CORRIDOR_LEN = 3;
-    private static final int MAX_CORRIDOR_LEN = 7;
+    private static final int MAX_CORRIDOR_LEN = 5;
     private static final int MAX_TURNS = 2;
     private static final int MAX_EXPANSION_DEPTH = 99; // max recursion / room depth
     private static final int MAX_TRIES_PER_DOOR = 5;
@@ -195,6 +195,11 @@ public class WorldGenerator {
                 }
                 // Do not pass through existing floor
                 if (floorOccupied.contains(curr)) {
+                    return null;
+                }
+                // Do not carve through blocking tiles like walls/doors
+                TETile existing = world[curr.x][curr.y];
+                if (isBlockingTile(existing)) {
                     return null;
                 }
 
@@ -404,7 +409,7 @@ public class WorldGenerator {
         for (int dx = 0; dx < room.template.width; dx++) {
             for (int dy = 0; dy < room.template.height; dy++) {
                 TETile tile = room.template.layout[dx][dy];
-                if (tile == Tileset.FLOOR) {
+                if (isWalkableTile(tile)) {
                     Point p = new Point(room.worldX + dx, room.worldY + dy);
                     if (floorOccupied.contains(p)) {
                         return false;
@@ -458,11 +463,37 @@ public class WorldGenerator {
         return true;
     }
 
+    private boolean isWalkableTile(TETile tile) {
+        if (tile == null) {
+            return false;
+        }
+        return tile != Tileset.AVATAR
+                && tile != Tileset.WALL
+                && tile != Tileset.NOTHING
+                && tile != Tileset.WATER
+                && tile != Tileset.LOCKED_DOOR
+                && tile != Tileset.MOUNTAIN
+                && tile != Tileset.TREE;
+    }
+
+    private boolean isBlockingTile(TETile tile) {
+        if (tile == null) {
+            return false;
+        }
+        return tile == Tileset.AVATAR
+                || tile == Tileset.WALL
+                || tile == Tileset.WATER
+                || tile == Tileset.LOCKED_DOOR
+                || tile == Tileset.UNLOCKED_DOOR
+                || tile == Tileset.MOUNTAIN
+                || tile == Tileset.TREE;
+    }
+
     private void registerRoomFloors(Room room) {
         for (int dx = 0; dx < room.template.width; dx++) {
             for (int dy = 0; dy < room.template.height; dy++) {
                 TETile tile = room.template.layout[dx][dy];
-                if (tile == Tileset.FLOOR) {
+                if (isWalkableTile(tile)) {
                     floorOccupied.add(new Point(room.worldX + dx, room.worldY + dy));
                 }
             }
