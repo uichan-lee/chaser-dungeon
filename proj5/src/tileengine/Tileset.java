@@ -14,6 +14,10 @@ import java.awt.Color;
  *
  * The style checker may crash when you try to style check this file due to use of unicode
  * characters. This is OK.
+ * 
+ * If a new tile is not walkable, you MUST modify isWalkableTile method in WorldGenerator.java.
+ * Following tiles are walkable: [FLOOR, GRASS, WATER, FLOWER, SAND, TREE]
+ * Following tiles are not walkable: [WALL, NOTHING, AVATAR, LOCKED_DOOR, UNLOCKED_DOOR, MOUNTAIN]
  */
 
 public class Tileset {
