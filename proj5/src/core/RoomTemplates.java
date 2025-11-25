@@ -69,6 +69,10 @@ public final class RoomTemplates {
         // T-shaped rooms
         templates.add(makeSmallTRoom()); // 17
 
+        // Round rooms
+        // templates.add(makeMediumRoundRoom()); // 18
+        // templates.add(makeLargeRoundRoom()); // 19
+
         // Keep adding more templates
 
         ALL_TEMPLATES = Collections.unmodifiableList(templates);
@@ -118,7 +122,7 @@ public final class RoomTemplates {
         int h = 5;
         TETile[][] layout = new TETile[w][h];
 
-        fill(layout, Tileset.SAND);
+        fill(layout, Tileset.FLOOR);
         addBoundaryWalls(layout);
 
         // Doors on all 4 sides
@@ -330,9 +334,9 @@ public final class RoomTemplates {
 
         // Door positions
         Point upperLeftDoor = new Point(2, 7); // Middle of upper wall
-        Point lowerRightDoor = new Point(7, 2); // Middle of right wall
+        Point bottomRightDoor = new Point(7, 2); // Middle of right wall
         Point leftDoor = new Point(0, 2);
-        List<Point> doors = List.of(upperLeftDoor, lowerRightDoor, leftDoor);
+        List<Point> doors = List.of(upperLeftDoor, bottomRightDoor, leftDoor);
         drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.RIGHT, Direction.LEFT);
@@ -376,10 +380,10 @@ public final class RoomTemplates {
 
         // Doors on the top and right sides.
         Point upperLeftDoor = new Point(3, 11);
-        Point lowerRightDoor = new Point(11, 3);
+        Point bottomRightDoor = new Point(11, 3);
         Point bottomDoor = new Point(3, 0);
         Point leftDoor = new Point(0, 3);
-        List<Point> doors = List.of(upperLeftDoor, lowerRightDoor, bottomDoor, leftDoor);
+        List<Point> doors = List.of(upperLeftDoor, bottomRightDoor, bottomDoor, leftDoor);
         drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT);
@@ -425,7 +429,7 @@ public final class RoomTemplates {
     /**
      * Small L-shaped room mirrored vertically (┌ shape).
      * Vertical leg on left, horizontal leg on top.
-     * Doors: (2, 0) [DOWN], (7, 5) [RIGHT]
+     * Doors: (2, 0) [DOWN], (0, 5) [LEFT], (7, 5) [RIGHT]
      * Index in ALL_TEMPLATES: 9.
      */
     private static RoomTemplate makeSmallLRoomMirroredV() {
@@ -446,10 +450,11 @@ public final class RoomTemplates {
 
         Point lowerLeftDoor = new Point(2, 0);
         Point upperRightDoor = new Point(7, 5);
-        List<Point> doors = List.of(lowerLeftDoor, upperRightDoor);
+        Point upperLeftDoor = new Point(0, 5);
+        List<Point> doors = List.of(lowerLeftDoor, upperRightDoor, upperLeftDoor);
         drawLockedDoors(doors, layout);
 
-        Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.RIGHT);
+        Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.RIGHT, Direction.LEFT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L, RoomType.SMALL);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
@@ -458,7 +463,7 @@ public final class RoomTemplates {
     /**
      * Small L-shaped room rotated 180 degrees (┐ shape).
      * Vertical leg on right, horizontal leg on top.
-     * Doors: (5, 0) [DOWN], (0, 5) [LEFT]
+     * Doors: (5, 0) [DOWN], (0, 5) [LEFT], (5, 7) [UP]
      * Index in ALL_TEMPLATES: 10.
      */
     private static RoomTemplate makeSmallLRoomRotated180() {
@@ -477,12 +482,13 @@ public final class RoomTemplates {
         // Add walls around the L-shaped floor region
         addWallsAroundFloor(layout);
 
-        Point lowerRightDoor = new Point(5, 0);
+        Point bottomRightDoor = new Point(5, 0);
         Point upperLeftDoor = new Point(0, 5);
-        List<Point> doors = List.of(lowerRightDoor, upperLeftDoor);
+        Point topDoor = new Point(5, 7);
+        List<Point> doors = List.of(bottomRightDoor, upperLeftDoor, topDoor);
         drawLockedDoors(doors, layout);
 
-        Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.LEFT);
+        Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.LEFT, Direction.UP);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L, RoomType.SMALL);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
@@ -491,7 +497,7 @@ public final class RoomTemplates {
     /**
      * Large L-shaped room mirrored horizontally (┘ shape).
      * Vertical leg on right, horizontal leg on bottom.
-     * Doors: (8, 11) [UP], (0, 3) [LEFT]
+     * Doors: (8, 11) [UP], (0, 3) [LEFT], (8, 0) [DOWN]
      * Index in ALL_TEMPLATES: 12.
      */
     private static RoomTemplate makeBigLRoomMirroredH() {
@@ -512,10 +518,11 @@ public final class RoomTemplates {
 
         Point upperRightDoor = new Point(8, 11);
         Point lowerLeftDoor = new Point(0, 3);
-        List<Point> doors = List.of(upperRightDoor, lowerLeftDoor);
+        Point bottomDoor = new Point(8, 0);
+        List<Point> doors = List.of(upperRightDoor, lowerLeftDoor, bottomDoor);
         drawLockedDoors(doors, layout);
 
-        Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.LEFT);
+        Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.LEFT, Direction.DOWN);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L, RoomType.BIG);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
@@ -524,7 +531,7 @@ public final class RoomTemplates {
     /**
      * Large L-shaped room mirrored vertically (┌ shape).
      * Vertical leg on left, horizontal leg on top.
-     * Doors: (3, 0) [DOWN], (11, 8) [RIGHT]
+     * Doors: (3, 0) [DOWN], (3, 11) [UP], (11, 8) [RIGHT]
      * Index in ALL_TEMPLATES: 13.
      */
     private static RoomTemplate makeBigLRoomMirroredV() {
@@ -545,7 +552,8 @@ public final class RoomTemplates {
 
         Point lowerLeftDoor = new Point(3, 0);
         Point upperRightDoor = new Point(11, 8);
-        List<Point> doors = List.of(lowerLeftDoor, upperRightDoor);
+        Point upperDoor = new Point(3, 11);
+        List<Point> doors = List.of(lowerLeftDoor, upperRightDoor, upperDoor);
         drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.RIGHT);
@@ -557,7 +565,7 @@ public final class RoomTemplates {
     /**
      * Large L-shaped room rotated 180 degrees (┐ shape).
      * Vertical leg on right, horizontal leg on top.
-     * Doors: (8, 0) [DOWN], (0, 8) [LEFT]
+     * Doors: (8, 0) [DOWN], (0, 8) [LEFT], (11, 3) [RIGHT]
      * Index in ALL_TEMPLATES: 14.
      */
     private static RoomTemplate makeBigLRoomRotated180() {
@@ -576,12 +584,14 @@ public final class RoomTemplates {
         // Add walls around the L-shaped floor region
         addWallsAroundFloor(layout);
 
-        Point lowerRightDoor = new Point(8, 0);
+        Point bottomRightDoor = new Point(8, 0);
         Point upperLeftDoor = new Point(0, 8);
-        List<Point> doors = List.of(lowerRightDoor, upperLeftDoor);
+        Point lowerRightDoor = new Point(11, 3);
+
+        List<Point> doors = List.of(bottomRightDoor, upperLeftDoor, lowerRightDoor);
         drawLockedDoors(doors, layout);
 
-        Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.LEFT);
+        Set<Direction> dirs = EnumSet.of(Direction.DOWN, Direction.LEFT, Direction.RIGHT);
         Set<RoomType> roomTypes = EnumSet.of(RoomType.L, RoomType.BIG);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
@@ -713,6 +723,66 @@ public final class RoomTemplates {
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
     }
 
+    /**
+     * Medium round room (diameter 9).
+     * Index in ALL_TEMPLATES: 18.
+     */
+    private static RoomTemplate makeMediumRoundRoom() {
+        int radius = 5;
+        int w = radius * 2 + 1; // 11
+        int h = w;
+        int cx = radius;
+        int cy = radius;
+
+        TETile[][] layout = new TETile[w][h];
+        fill(layout, Tileset.NOTHING);
+
+        fillCircle(layout, cx, cy, radius, Tileset.WALL);
+        fillCircle(layout, cx, cy, radius - 1, Tileset.FLOOR);
+
+        Point topDoor = new Point(cx, h - 1);
+        Point bottomDoor = new Point(cx, 0);
+        Point leftDoor = new Point(0, cy);
+        Point rightDoor = new Point(w - 1, cy);
+        List<Point> doors = List.of(topDoor, bottomDoor, leftDoor, rightDoor);
+        drawLockedDoors(doors, layout);
+
+        Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.SPECIAL);
+
+        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
+    }
+
+    /**
+     * Large round room (diameter 15).
+     * Index in ALL_TEMPLATES: 19.
+     */
+    private static RoomTemplate makeLargeRoundRoom() {
+        int radius = 7;
+        int w = radius * 2 + 1; // 15
+        int h = w;
+        int cx = radius;
+        int cy = radius;
+
+        TETile[][] layout = new TETile[w][h];
+        fill(layout, Tileset.NOTHING);
+
+        fillCircle(layout, cx, cy, radius, Tileset.WALL);
+        fillCircle(layout, cx, cy, radius - 1, Tileset.FLOOR);
+
+        Point topDoor = new Point(cx, h - 1);
+        Point bottomDoor = new Point(cx, 0);
+        Point leftDoor = new Point(0, cy);
+        Point rightDoor = new Point(w - 1, cy);
+        List<Point> doors = List.of(topDoor, bottomDoor, leftDoor, rightDoor);
+        drawLockedDoors(doors, layout);
+
+        Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.BIG, RoomType.SPECIAL);
+
+        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
+    }
+
     /*
      * =====================================================
      * Helper methods
@@ -805,6 +875,25 @@ public final class RoomTemplates {
                 int dy = y - centerY;
                 int dist = Math.max(Math.abs(dx), Math.abs(dy)); // Chebyshev distance for square rings
                 if (dist > innerRadius && dist <= outerRadius) {
+                    layout[x][y] = tile;
+                }
+            }
+        }
+    }
+
+    private static void fillCircle(TETile[][] layout, int centerX, int centerY, int radius, TETile tile) {
+        if (radius < 0) {
+            return;
+        }
+        int w = layout.length;
+        int h = layout[0].length;
+
+        int radiusSq = radius * radius;
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                int dx = x - centerX;
+                int dy = y - centerY;
+                if (dx * dx + dy * dy <= radiusSq) {
                     layout[x][y] = tile;
                 }
             }

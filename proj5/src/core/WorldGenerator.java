@@ -39,7 +39,7 @@ public class WorldGenerator {
     // Tunable parameters
     private static final int MIN_CORRIDOR_LEN = 3;
     private static final int MAX_CORRIDOR_LEN = 5;
-    private static final int MAX_TURNS = 2;
+    private static final int MAX_TURNS = 3;
     private static final int MAX_EXPANSION_DEPTH = 99; // max recursion / room depth
     private static final int MAX_TRIES_PER_DOOR = 5;
 

@@ -13,7 +13,7 @@ public class WorldTest {
     private static final long seed = 379;
 
     public static void main(String[] args) {
-        SingleRoomTest(7);
+        SingleRoomTest(18);
     }
 
     private static void customTest() {
