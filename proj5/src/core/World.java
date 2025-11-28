@@ -15,7 +15,7 @@ public class World {
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
 
-        long seed = 395745; 
+        long seed = 5612584838579522635L; 
         WorldGenerator gen = new WorldGenerator(WIDTH, HEIGHT, seed);
         TETile[][] world = gen.generate();
 
@@ -24,3 +24,11 @@ public class World {
 
 }
 
+/*
+Testing seeds:
+4713243392582896162
+6653139552634618902
+8808195048176907092
+7861102110841635892
+5612584838579522635
+*/
