@@ -53,7 +53,15 @@ public class HUDTest {
                 case 'n':
                 case 'N':
                     long seed = getSeedInput();
-                    generateAndRenderWorld(seed);
+                    if (verifySeed(seed)) {
+                        generateAndRenderWorld(seed);
+                    } else {
+                        // Return to main menu if verification failed
+                        StdDraw.clear(StdDraw.BLACK);
+                        drawTitle();
+                        drawMenu();
+                        StdDraw.show();
+                    }
                     break;
                 case 'l':
                 case 'L':
@@ -181,6 +189,54 @@ public class HUDTest {
 
     private static void loadGame() {
         // TODO: Implement
+    }
+
+    /**
+     * Verifies the seed input by displaying it and asking for confirmation.
+     * 
+     * @param seed the seed to verify
+     * @return true if user confirms (Y), false if user cancels (N)
+     */
+    private static boolean verifySeed(long seed) {
+        // Clear and redraw
+        StdDraw.clear(StdDraw.BLACK);
+        drawMenuBox();
+        drawTitle();
+
+        // Display seed verification message
+        StdDraw.setPenRadius(0.01);
+        StdDraw.setPenColor(StdDraw.YELLOW);
+        StdDraw.setFont(MENU_FONT);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.7, "Seed: " + seed);
+        
+        StdDraw.setPenColor(StdDraw.WHITE);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.5, "Press Y to confirm");
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.3, "Press N to cancel");
+        StdDraw.show();
+
+        // Wait for Y or N input
+        while (true) {
+            if (!StdDraw.hasNextKeyTyped()) {
+                continue;
+            }
+            char c = StdDraw.nextKeyTyped();
+            
+            if (c == 'y' || c == 'Y') {
+                return true;
+            } else if (c == 'n' || c == 'N') {
+                return false;
+            } else {
+                // Clear warning area
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.25, (double) MENU_WIDTH / 2, 2);
+                
+                // Print invalid message
+                StdDraw.setPenColor(StdDraw.ORANGE);
+                StdDraw.setFont(SMALL_WARNING_FONT);
+                StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.25, "Invalid Input. Press Y or N.");
+                StdDraw.show();
+            }
+        }
     }
 
     /**
