@@ -12,15 +12,18 @@ public class HUDTest {
     public static final Font SMALL_WARNING_FONT = new Font("DialogInput", Font.BOLD, 20);
     public static final Font TITLE_FONT = new Font("DialogInput", Font.BOLD, 70);
     public static final Font MENU_FONT = new Font("DialogInput", Font.BOLD, 40);
-    public static final Font SEED_FONT = new Font("DialogInput", Font.BOLD, 20);
+    public static final Font SEED_FONT = new Font("DialogInput", Font.PLAIN, 20);
+    public static final Font MINI_FONT = new Font("DialogInput", Font.ITALIC, 12);
 
     // World size constants
-    private static final int SMALL_WIDTH = 60;
-    private static final int SMALL_HEIGHT = 40;
+    private static final int SMALL_WIDTH = 50;
+    private static final int SMALL_HEIGHT = 30;
+
     private static final int MEDIUM_WIDTH = 80;
     private static final int MEDIUM_HEIGHT = 50;
-    private static final int BIG_WIDTH = 100;
-    private static final int BIG_HEIGHT = 60;
+
+    private static final int BIG_WIDTH = 110;
+    private static final int BIG_HEIGHT = 70;
     
     private static final int MENU_WIDTH = 56;
     private static final int MENU_HEIGHT = 50;
@@ -281,9 +284,18 @@ public class HUDTest {
         
         StdDraw.setFont(SEED_FONT);
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.6, "(S) Small: " + SMALL_WIDTH + "x" + SMALL_HEIGHT);
+
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.5, "(M) Medium: " + MEDIUM_WIDTH + "x" + MEDIUM_HEIGHT);
+
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.4, "(B) Big: " + BIG_WIDTH + "x" + BIG_HEIGHT);
+
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.25, "(N) Cancel");
+        
+        StdDraw.setFont(MINI_FONT);
+        StdDraw.setPenColor(StdDraw.GRAY);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.47, "Recommended for most devices");
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.37, "Recommended for large monitors");
+        
         StdDraw.show();
 
         // Wait for S, M, B, or N input
