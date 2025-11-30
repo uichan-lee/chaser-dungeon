@@ -11,23 +11,27 @@ public class HUDTest {
     // Fonts
     public static final Font SMALL_WARNING_FONT = new Font("DialogInput", Font.BOLD, 20);
     public static final Font TITLE_FONT = new Font("DialogInput", Font.BOLD, 70);
-    public static final Font MENU_FONT = new Font("DialogInput", Font.BOLD, 50);
+    public static final Font MENU_FONT = new Font("DialogInput", Font.BOLD, 40);
     public static final Font SEED_FONT = new Font("DialogInput", Font.BOLD, 20);
 
-    private static final int WORLD_WIDTH = 100;
-    private static final int WORLD_HEIGHT = 60;
+    // World size constants
+    private static final int SMALL_WIDTH = 60;
+    private static final int SMALL_HEIGHT = 40;
+    private static final int MEDIUM_WIDTH = 80;
+    private static final int MEDIUM_HEIGHT = 50;
+    private static final int BIG_WIDTH = 100;
+    private static final int BIG_HEIGHT = 60;
+    
     private static final int MENU_WIDTH = 56;
-    private static final int MENU_HEIGHT = 70;
-    private static final int SEED_MAXIMUM_LENGTH = 30;
-
-    private final long seed = 56125848385792635L;
+    private static final int MENU_HEIGHT = 50;
+    private static final int SEED_MAXIMUM_LENGTH = 18;
 
     public static void main(String[] args) {
         TERenderer renderer = new TERenderer();
-        renderer.initialize(MENU_WIDTH, MENU_HEIGHT);   // Initialize world
+        renderer.initialize(MENU_WIDTH, MENU_HEIGHT);
 
-        drawTitle();    // Draw title
-        drawMenu();     // Draw Menu (square + options)
+        drawTitle();
+        drawMenu();
         StdDraw.show();
 
         mainMenu();
@@ -54,7 +58,16 @@ public class HUDTest {
                 case 'N':
                     long seed = getSeedInput();
                     if (verifySeed(seed)) {
-                        generateAndRenderWorld(seed);
+                        int[] worldSize = selectWorldSize();
+                        if (worldSize != null) {
+                            generateAndRenderWorld(seed, worldSize[0], worldSize[1]);
+                        } else {
+                            // Return to main menu if size selection was cancelled
+                            StdDraw.clear(StdDraw.BLACK);
+                            drawTitle();
+                            drawMenu();
+                            StdDraw.show();
+                        }
                     } else {
                         // Return to main menu if verification failed
                         StdDraw.clear(StdDraw.BLACK);
@@ -73,17 +86,16 @@ public class HUDTest {
                     break;
                 default:
                     // clear area
-                    StdDraw.setPenColor(StdDraw.BLACK);
-                    StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.88, (double) MENU_WIDTH / 2, 2);
+                    clearMessageArea();
 
                     // Print invalid message
-                    StdDraw.setPenColor(StdDraw.ORANGE);
-                    StdDraw.setFont(SMALL_WARNING_FONT);
-                    StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.88, "Invalid Input. Select from N/L/Q.");
+                    addOrangeMessage("Invalid Input. Select from N/L/Q.");
                     StdDraw.show();
             }
         }
     }
+
+
 
     private static void drawTitle() {
         // Title: "CS 61B: BYOW"
@@ -125,8 +137,8 @@ public class HUDTest {
 
         StdDraw.setPenRadius(0.01);
         StdDraw.setPenColor(StdDraw.WHITE);
-        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.7, "Enter seed");
-        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.6, "followed by S");
+        StdDraw.setFont(MENU_FONT);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.7, "Enter seed followed by S");
         StdDraw.show();
 
         StdDraw.setPenColor(StdDraw.YELLOW);
@@ -142,38 +154,38 @@ public class HUDTest {
 
             // Return seed if the input is s or S
             if (c == 's' || c == 'S') {
+                if (sb.isEmpty()) {
+                    // clear area
+                    clearMessageArea();
+
+                    // Print invalid message
+                    addOrangeMessage("Seed cannot be empty.");
+                    StdDraw.show();
+                    continue;
+                }
+
                 String seed = sb.toString();
                 return Long.parseLong(seed);
             } else if (sb.length() > SEED_MAXIMUM_LENGTH) { // seed maximum length exceeded
-                // clear area
-                StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.88, (double) MENU_WIDTH / 2, 2);
+                clearMessageArea();
 
                 // Print invalid message
-                StdDraw.setPenColor(StdDraw.ORANGE);
-                StdDraw.setFont(SMALL_WARNING_FONT);
-                StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.88, "Maximum seed length reached (30).");
+                addOrangeMessage(String.format("Maximum length exceeded (%d).", SEED_MAXIMUM_LENGTH));
                 StdDraw.show();
-                continue;
             } else if (!Character.isDigit(c)) { // If input is not a number (invalid input)
                 // clear area
-                StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.88, (double) MENU_WIDTH / 2, 2);
+                clearMessageArea();
 
                 // Print invalid message
-                StdDraw.setPenColor(StdDraw.ORANGE);
-                StdDraw.setFont(SMALL_WARNING_FONT);
-                StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.88, "Invalid Input. Type only numbers.");
+                addOrangeMessage("Invalid Input. Type only numbers.");
                 StdDraw.show();
-                continue;
             } else { // If c is a number (digit)
 
 
                 sb.append(c);
 
                 // clear area
-                StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.88, (double) MENU_WIDTH / 2, 2);
+                clearMessageArea();
                 StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.4, (double) MENU_WIDTH * 0.35, 2);
 
                 // Print input seed
@@ -181,10 +193,21 @@ public class HUDTest {
                 StdDraw.setFont(SEED_FONT);
                 StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.4, sb.toString());
                 StdDraw.show();
-                continue;
             }
 
         }
+    }
+
+    private static void clearMessageArea() {
+        // clear area
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.1, (double) MENU_WIDTH * 0.35, 2);
+    }
+
+    private static void addOrangeMessage(String text) {
+        StdDraw.setPenColor(StdDraw.ORANGE);
+        StdDraw.setFont(SMALL_WARNING_FONT);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.1, text);
     }
 
     private static void loadGame() {
@@ -228,7 +251,7 @@ public class HUDTest {
             } else {
                 // Clear warning area
                 StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.25, (double) MENU_WIDTH / 2, 2);
+                StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.25, (double) MENU_WIDTH * 0.3, 2);
                 
                 // Print invalid message
                 StdDraw.setPenColor(StdDraw.ORANGE);
@@ -240,15 +263,70 @@ public class HUDTest {
     }
 
     /**
+     * Prompts the user to select a world size (Small, Medium, or Big).
+     * 
+     * @return an array [width, height] if a size is selected, null if cancelled
+     */
+    private static int[] selectWorldSize() {
+        // Clear and redraw
+        StdDraw.clear(StdDraw.BLACK);
+        drawMenuBox();
+        drawTitle();
+
+        // Display world size selection menu
+        StdDraw.setPenRadius(0.01);
+        StdDraw.setPenColor(StdDraw.WHITE);
+        StdDraw.setFont(MENU_FONT);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.75, "Select World Size");
+        
+        StdDraw.setFont(SEED_FONT);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.6, "(S) Small: " + SMALL_WIDTH + "x" + SMALL_HEIGHT);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.5, "(M) Medium: " + MEDIUM_WIDTH + "x" + MEDIUM_HEIGHT);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.4, "(B) Big: " + BIG_WIDTH + "x" + BIG_HEIGHT);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.25, "(N) Cancel");
+        StdDraw.show();
+
+        // Wait for S, M, B, or N input
+        while (true) {
+            if (!StdDraw.hasNextKeyTyped()) {
+                continue;
+            }
+            char c = StdDraw.nextKeyTyped();
+            
+            if (c == 's' || c == 'S') {
+                return new int[]{SMALL_WIDTH, SMALL_HEIGHT};
+            } else if (c == 'm' || c == 'M') {
+                return new int[]{MEDIUM_WIDTH, MEDIUM_HEIGHT};
+            } else if (c == 'b' || c == 'B') {
+                return new int[]{BIG_WIDTH, BIG_HEIGHT};
+            } else if (c == 'n' || c == 'N') {
+                return null;
+            } else {
+                // Clear warning area
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.15, (double) MENU_WIDTH * 0.3, 2);
+                
+                // Print invalid message
+                StdDraw.setPenColor(StdDraw.ORANGE);
+                StdDraw.setFont(SMALL_WARNING_FONT);
+                StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.15, "Invalid Input. Press S/M/B/N.");
+                StdDraw.show();
+            }
+        }
+    }
+
+    /**
      * Generates a world using the given seed and renders it.
      * 
      * @param seed the seed for world generation
+     * @param width the width of the world
+     * @param height the height of the world
      */
-    private static void generateAndRenderWorld(long seed) {
+    private static void generateAndRenderWorld(long seed, int width, int height) {
         TERenderer renderer = new TERenderer();
-        renderer.initialize(WORLD_WIDTH, WORLD_HEIGHT);
+        renderer.initialize(width, height);
         
-        WorldGenerator gen = new WorldGenerator(WORLD_WIDTH, WORLD_HEIGHT, seed);
+        WorldGenerator gen = new WorldGenerator(width, height, seed);
         TETile[][] world = gen.generate();
         
         renderer.renderFrame(world);
