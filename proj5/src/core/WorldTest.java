@@ -1,5 +1,6 @@
 package core;
 
+import edu.princeton.cs.algs4.StdDraw;
 import tileengine.TERenderer;
 import tileengine.TETile;
 import tileengine.Tileset;
@@ -13,7 +14,7 @@ public class WorldTest {
     private static final long seed = 379;
 
     public static void main(String[] args) {
-        SingleRoomTest(18);
+//        SingleRoomTest(18);
     }
 
     private static void customTest() {
@@ -36,23 +37,6 @@ public class WorldTest {
         }
 
         Room diamondRoom = new Room(ROOM_TEMPLATES.get(roomIndex), WIDTH / 2, HEIGHT / 2);
-        diamondRoom.drawInto(world);
-
-        ter.renderFrame(world);
-    }
-
-    private static void diamondTest() {
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
-        TETile[][] world = new TETile[WIDTH][HEIGHT];
-
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                world[x][y] = Tileset.NOTHING;
-            }
-        }
-
-        Room diamondRoom = new Room(ROOM_TEMPLATES.get(16), WIDTH / 2, HEIGHT / 2);
         diamondRoom.drawInto(world);
 
         ter.renderFrame(world);
