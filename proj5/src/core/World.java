@@ -7,7 +7,7 @@ import tileengine.Tileset;
 import java.util.List;
 
 public class World {
-    private static final int WIDTH = 80;
+    private static final int WIDTH = 100;
     private static final int HEIGHT = 60;
     private static final List<RoomTemplate> ROOM_TEMPLATES = RoomTemplates.ALL_TEMPLATES;
 
@@ -15,7 +15,7 @@ public class World {
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
 
-        long seed = 5612584838579522635L; 
+        long seed = 56125848385792635L; 
         WorldGenerator gen = new WorldGenerator(WIDTH, HEIGHT, seed);
         TETile[][] world = gen.generate();
 

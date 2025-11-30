@@ -509,7 +509,7 @@ public class WorldGenerator {
     /**
      * Updates all door tiles in the world:
      * - Doors that are in connectedDoors become UNLOCKED_DOOR
-     * - Doors that are not in connectedDoors become LOCKED_DOOR
+     * - Doors that are not in connectedDoors become WALL
      */
     private void updateDoorTiles() {
         for (Room room : rooms) {
@@ -518,7 +518,7 @@ public class WorldGenerator {
                 if (connectedDoors.contains(doorWorld)) {
                     world[doorWorld.x][doorWorld.y] = Tileset.UNLOCKED_DOOR;
                 } else {
-                    world[doorWorld.x][doorWorld.y] = Tileset.LOCKED_DOOR;
+                    world[doorWorld.x][doorWorld.y] = Tileset.WALL;
                 }
             }
         }

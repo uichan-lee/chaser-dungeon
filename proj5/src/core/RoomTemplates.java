@@ -70,8 +70,8 @@ public final class RoomTemplates {
         templates.add(makeSmallTRoom()); // 17
 
         // Round rooms
-        // templates.add(makeMediumRoundRoom()); // 18
-        // templates.add(makeLargeRoundRoom()); // 19
+         templates.add(makeMediumRoundTreasureRoom()); // 18
+         templates.add(makeLargeRoundTreasureRoom()); // 19
 
         // Keep adding more templates
 
@@ -151,8 +151,13 @@ public final class RoomTemplates {
         int h = 7;
         TETile[][] layout = new TETile[w][h];
 
-        fill(layout, Tileset.FLOOR);
+        fill(layout, Tileset.SAND);
         addBoundaryWalls(layout);
+
+        // Add decorative elements
+        layout[3][3] = Tileset.STATUE;
+        layout[1][5] = Tileset.FLOWER;
+        layout[5][1] = Tileset.FLOWER;
 
         // Four doors, one centered on each wall.
         Point leftDoor = new Point(0, h / 2); // left wall center
@@ -180,8 +185,19 @@ public final class RoomTemplates {
         int h = 11;
         TETile[][] layout = new TETile[w][h];
 
-        fill(layout, Tileset.FLOOR);
+        fill(layout, Tileset.GRASS);
         addBoundaryWalls(layout);
+
+        // Add decorative elements - library/study room
+        layout[2][2] = Tileset.BOOKSHELF;
+        layout[8][2] = Tileset.BOOKSHELF;
+        layout[2][8] = Tileset.BOOKSHELF;
+        layout[8][8] = Tileset.BOOKSHELF;
+        layout[5][5] = Tileset.STATUE;
+        layout[3][5] = Tileset.FLOWER;
+        layout[7][5] = Tileset.FLOWER;
+        layout[5][3] = Tileset.FLOWER;
+        layout[5][7] = Tileset.FLOWER;
 
         // Four doors, one centered on each wall.
         Point leftDoor = new Point(0, h / 2); // left wall center
@@ -208,8 +224,14 @@ public final class RoomTemplates {
         int h = 5;
         TETile[][] layout = new TETile[w][h];
 
-        fill(layout, Tileset.FLOOR);
+        fill(layout, Tileset.SAND);
         addBoundaryWalls(layout);
+
+        // Add decorative elements
+        layout[2][2] = Tileset.CRATE;
+        layout[6][2] = Tileset.CRATE;
+        layout[4][1] = Tileset.FLOWER;
+        layout[4][3] = Tileset.FLOWER;
 
         // Doors centered vertically on left and right walls.
         Point leftDoor = new Point(0, h / 2); // (0, 2)
@@ -235,8 +257,19 @@ public final class RoomTemplates {
         int h = 7;
         TETile[][] layout = new TETile[w][h];
 
-        fill(layout, Tileset.FLOOR);
+        fill(layout, Tileset.GRASS);
         addBoundaryWalls(layout);
+
+        // Add trees and flowers along the corridor
+        layout[2][3] = Tileset.TREE;
+        layout[4][3] = Tileset.FLOWER;
+        layout[6][3] = Tileset.TREE;
+        layout[8][3] = Tileset.FLOWER;
+        layout[10][3] = Tileset.TREE;
+        layout[3][2] = Tileset.BUSH;
+        layout[9][2] = Tileset.BUSH;
+        layout[3][4] = Tileset.BUSH;
+        layout[9][4] = Tileset.BUSH;
 
         // Doors centered vertically on left and right walls.
         Point leftDoor = new Point(0, h / 2); // (0, 3)
@@ -261,8 +294,14 @@ public final class RoomTemplates {
         int h = 9;
         TETile[][] layout = new TETile[w][h];
 
-        fill(layout, Tileset.FLOOR);
+        fill(layout, Tileset.SNOW);
         addBoundaryWalls(layout);
+
+        // Add decorative elements
+        layout[2][2] = Tileset.STATUE;
+        layout[2][6] = Tileset.STATUE;
+        layout[1][4] = Tileset.FLOWER;
+        layout[3][4] = Tileset.FLOWER;
 
         // Doors centered horizontally on bottom and top walls.
         Point bottomDoor = new Point(w / 2, 0); // (2, 0)
@@ -290,6 +329,17 @@ public final class RoomTemplates {
 
         fill(layout, Tileset.FLOOR);
         addBoundaryWalls(layout);
+
+        // Add decorative elements along the road
+        layout[3][2] = Tileset.STATUE;
+        layout[3][6] = Tileset.STATUE;
+        layout[3][10] = Tileset.STATUE;
+        layout[1][4] = Tileset.TREE;
+        layout[5][4] = Tileset.TREE;
+        layout[1][8] = Tileset.TREE;
+        layout[5][8] = Tileset.TREE;
+        layout[2][6] = Tileset.FLOWER;
+        layout[4][6] = Tileset.FLOWER;
 
         // Doors centered horizontally on bottom and top walls.
         Point bottomDoor = new Point(w / 2, 0); // (3, 0)
@@ -324,13 +374,17 @@ public final class RoomTemplates {
         fill(layout, Tileset.NOTHING);
 
         // Vertical leg: x=1..3, y=1..6 (width=3, height=6)
-        fillRect(layout, 1, 1, 3, 6, Tileset.FLOOR);
+        fillRect(layout, 1, 1, 3, 6, Tileset.SAND);
 
         // Horizontal leg: x=1..6, y=1..3 (width=6, height=3)
-        fillRect(layout, 1, 1, 6, 3, Tileset.FLOOR);
+        fillRect(layout, 1, 1, 6, 3, Tileset.SAND);
+
+        // Add decorative elements
+        layout[2][3] = Tileset.CRATE;
+        layout[4][2] = Tileset.FLOWER;
 
         // Add walls around floor tiles
-        addWallsAroundFloor(layout);
+        addWallsAroundFloor(layout, Tileset.SAND);
 
         // Door positions
         Point upperLeftDoor = new Point(2, 7); // Middle of upper wall
@@ -370,13 +424,22 @@ public final class RoomTemplates {
         fill(layout, Tileset.NOTHING);
 
         // Vertical leg: x = 1..5, y = 1..10 (width=5, height=10)
-        fillRect(layout, 1, 1, 5, 10, Tileset.FLOOR);
+        fillRect(layout, 1, 1, 5, 10, Tileset.GRASS);
 
         // Horizontal leg: x = 1..10, y = 1..5 (width=10, height=5)
-        fillRect(layout, 1, 1, 10, 5, Tileset.FLOOR);
+        fillRect(layout, 1, 1, 10, 5, Tileset.GRASS);
+
+        // Add decorative elements
+        layout[3][3] = Tileset.TREE;
+        layout[3][7] = Tileset.TREE;
+        layout[7][3] = Tileset.TREE;
+        layout[2][2] = Tileset.FLOWER;
+        layout[4][2] = Tileset.FLOWER;
+        layout[6][2] = Tileset.FLOWER;
+        layout[8][2] = Tileset.FLOWER;
 
         // Add walls around the L-shaped floor region
-        addWallsAroundFloor(layout);
+        addWallsAroundFloor(layout, Tileset.GRASS);
 
         // Doors on the top and right sides.
         Point upperLeftDoor = new Point(3, 11);
@@ -406,13 +469,17 @@ public final class RoomTemplates {
         fill(layout, Tileset.NOTHING);
 
         // Vertical leg on right: x=4..6, y=1..6 (width=3, height=6)
-        fillRect(layout, 4, 1, 3, 6, Tileset.FLOOR);
+        fillRect(layout, 4, 1, 3, 6, Tileset.SNOW);
 
         // Horizontal leg on bottom: x=1..6, y=1..3 (width=6, height=3)
-        fillRect(layout, 1, 1, 6, 3, Tileset.FLOOR);
+        fillRect(layout, 1, 1, 6, 3, Tileset.SNOW);
+
+        // Add decorative elements
+        layout[5][3] = Tileset.STATUE;
+        layout[3][2] = Tileset.FLOWER;
 
         // Add walls around the L-shaped floor region
-        addWallsAroundFloor(layout);
+        addWallsAroundFloor(layout, Tileset.SNOW);
 
         Point upperRightDoor = new Point(5, 7);
         Point lowerLeftDoor = new Point(0, 2);
@@ -440,13 +507,18 @@ public final class RoomTemplates {
         fill(layout, Tileset.NOTHING);
 
         // Vertical leg on left: x=1..3, y=1..6 (width=3, height=6)
-        fillRect(layout, 1, 1, 3, 6, Tileset.FLOOR);
+        fillRect(layout, 1, 1, 3, 6, Tileset.SAND);
 
         // Horizontal leg on top: x=1..6, y=4..6 (width=6, height=3)
-        fillRect(layout, 1, 4, 6, 3, Tileset.FLOOR);
+        fillRect(layout, 1, 4, 6, 3, Tileset.SAND);
+
+        // Add decorative elements
+        layout[2][5] = Tileset.CRATE;
+        layout[4][5] = Tileset.FLOWER;
+        layout[2][3] = Tileset.FLOWER;
 
         // Add walls around the L-shaped floor region
-        addWallsAroundFloor(layout);
+        addWallsAroundFloor(layout, Tileset.SAND);
 
         Point lowerLeftDoor = new Point(2, 0);
         Point upperRightDoor = new Point(7, 5);
@@ -474,13 +546,18 @@ public final class RoomTemplates {
         fill(layout, Tileset.NOTHING);
 
         // Vertical leg on right: x=4..6, y=1..6 (width=3, height=6)
-        fillRect(layout, 4, 1, 3, 6, Tileset.FLOOR);
+        fillRect(layout, 4, 1, 3, 6, Tileset.GRASS);
 
         // Horizontal leg on top: x=1..6, y=4..6 (width=6, height=3)
-        fillRect(layout, 1, 4, 6, 3, Tileset.FLOOR);
+        fillRect(layout, 1, 4, 6, 3, Tileset.GRASS);
+
+        // Add decorative elements
+        layout[5][5] = Tileset.TREE;
+        layout[3][5] = Tileset.FLOWER;
+        layout[5][3] = Tileset.BUSH;
 
         // Add walls around the L-shaped floor region
-        addWallsAroundFloor(layout);
+        addWallsAroundFloor(layout, Tileset.GRASS);
 
         Point bottomRightDoor = new Point(5, 0);
         Point upperLeftDoor = new Point(0, 5);
@@ -513,8 +590,15 @@ public final class RoomTemplates {
         // Horizontal leg on bottom: x = 1..10, y = 1..5 (width=10, height=5)
         fillRect(layout, 1, 1, 10, 5, Tileset.FLOOR);
 
+        // Add decorative elements
+        layout[8][3] = Tileset.STATUE;
+        layout[8][7] = Tileset.STATUE;
+        layout[4][3] = Tileset.TREE;
+        layout[7][3] = Tileset.FLOWER;
+        layout[3][3] = Tileset.FLOWER;
+
         // Add walls around the L-shaped floor region
-        addWallsAroundFloor(layout);
+        addWallsAroundFloor(layout, Tileset.FLOOR);
 
         Point upperRightDoor = new Point(8, 11);
         Point lowerLeftDoor = new Point(0, 3);
@@ -542,13 +626,19 @@ public final class RoomTemplates {
         fill(layout, Tileset.NOTHING);
 
         // Vertical leg on left: x = 1..5, y = 1..10 (width=5, height=10)
-        fillRect(layout, 1, 1, 5, 10, Tileset.FLOOR);
+        fillRect(layout, 1, 1, 5, 10, Tileset.SNOW);
 
         // Horizontal leg on top: x = 1..10, y = 6..10 (width=10, height=5)
-        fillRect(layout, 1, 6, 10, 5, Tileset.FLOOR);
+        fillRect(layout, 1, 6, 10, 5, Tileset.SNOW);
+
+        // Add decorative elements
+        layout[3][3] = Tileset.STATUE;
+        layout[3][7] = Tileset.STATUE;
+        layout[6][8] = Tileset.FLOWER;
+        layout[8][8] = Tileset.FLOWER;
 
         // Add walls around the L-shaped floor region
-        addWallsAroundFloor(layout);
+        addWallsAroundFloor(layout, Tileset.SNOW);
 
         Point lowerLeftDoor = new Point(3, 0);
         Point upperRightDoor = new Point(11, 8);
@@ -576,13 +666,22 @@ public final class RoomTemplates {
         fill(layout, Tileset.NOTHING);
 
         // Vertical leg on right: x = 6..10, y = 1..10 (width=5, height=10)
-        fillRect(layout, 6, 1, 5, 10, Tileset.FLOOR);
+        fillRect(layout, 6, 1, 5, 10, Tileset.GRASS);
 
         // Horizontal leg on top: x = 1..10, y = 6..10 (width=10, height=5)
-        fillRect(layout, 1, 6, 10, 5, Tileset.FLOOR);
+        fillRect(layout, 1, 6, 10, 5, Tileset.GRASS);
+
+        // Add decorative elements
+        layout[8][3] = Tileset.TREE;
+        layout[8][7] = Tileset.TREE;
+        layout[4][8] = Tileset.TREE;
+        layout[7][8] = Tileset.TREE;
+        layout[3][8] = Tileset.FLOWER;
+        layout[6][8] = Tileset.FLOWER;
+        layout[9][8] = Tileset.FLOWER;
 
         // Add walls around the L-shaped floor region
-        addWallsAroundFloor(layout);
+        addWallsAroundFloor(layout, Tileset.GRASS);
 
         Point bottomRightDoor = new Point(8, 0);
         Point upperLeftDoor = new Point(0, 8);
@@ -612,9 +711,15 @@ public final class RoomTemplates {
         fill(layout, Tileset.NOTHING);
 
         // Fill outer layer will wall
-        fillRing(layout, w / 2, h / 2, 1, 2, Tileset.FLOOR);
+        fillRing(layout, w / 2, h / 2, 1, 2, Tileset.SAND);
         fillRing(layout, w / 2, h / 2, 2, 3, Tileset.WALL); // outer wall
         fillRing(layout, w / 2, h / 2, 0, 1, Tileset.WALL); // inner wall
+        
+        // Add decorative elements
+        layout[1][3] = Tileset.STATUE;
+        layout[5][3] = Tileset.STATUE;
+        layout[3][1] = Tileset.FLOWER;
+        layout[3][5] = Tileset.FLOWER;
 
         Point leftDoor = new Point(0, 3);
         Point rightDoor = new Point(6, 3);
@@ -640,9 +745,19 @@ public final class RoomTemplates {
 
         fill(layout, Tileset.NOTHING);
 
-        fillRing(layout, w / 2, h / 2, 2, 5, Tileset.FLOOR);
+        fillRing(layout, w / 2, h / 2, 2, 5, Tileset.GRASS);
         fillRing(layout, w / 2, h / 2, 5, 6, Tileset.WALL); // outer wall
         fillRing(layout, w / 2, h / 2, 1, 2, Tileset.WALL); // inner wall
+        
+        // Add decorative elements
+        layout[2][6] = Tileset.TREE;
+        layout[10][6] = Tileset.TREE;
+        layout[6][2] = Tileset.TREE;
+        layout[6][10] = Tileset.TREE;
+        layout[4][6] = Tileset.STATUE;
+        layout[8][6] = Tileset.STATUE;
+        layout[6][4] = Tileset.FLOWER;
+        layout[6][8] = Tileset.FLOWER;
 
         Point leftDoor = new Point(0, 6);
         Point rightDoor = new Point(12, 6);
@@ -670,7 +785,12 @@ public final class RoomTemplates {
         fill(layout, Tileset.NOTHING);
 
         createDiamond(layout, 3, 3, 3, Tileset.WALL);
-        createDiamond(layout, 3, 3, 2, Tileset.FLOOR);
+        createDiamond(layout, 3, 3, 2, Tileset.SNOW);
+        
+        // Add decorative elements
+        layout[3][3] = Tileset.STATUE;
+        layout[2][3] = Tileset.FLOWER;
+        layout[4][3] = Tileset.FLOWER;
 
         Point leftDoor = new Point(0, 3);
         Point rightDoor = new Point(6, 3);
@@ -706,9 +826,15 @@ public final class RoomTemplates {
         // Square at the bottom: x=4 to x=6, y=1 to y=6
         fillRect(layout, 4, 1, 3, 3, Tileset.FLOOR);
 
+        // Add decorative elements
+        layout[3][5] = Tileset.STATUE;
+        layout[7][5] = Tileset.STATUE;
+        layout[5][2] = Tileset.FLOWER;
+        layout[2][5] = Tileset.TREE;
+        layout[8][5] = Tileset.TREE;
         
         // Add walls around floor tiles
-        addWallsAroundFloor(layout);
+        addWallsAroundFloor(layout, Tileset.FLOOR);
 
         // Doors at specified positions
         Point bottomDoor = new Point(5, 0); // Bottom center
@@ -724,21 +850,32 @@ public final class RoomTemplates {
     }
 
     /**
-     * Medium round room (diameter 9).
+     * Medium round room (diameter 10).
      * Index in ALL_TEMPLATES: 18.
+     * Treasure in the middle of the room.
      */
-    private static RoomTemplate makeMediumRoundRoom() {
+    private static RoomTemplate makeMediumRoundTreasureRoom() {
         int radius = 5;
-        int w = radius * 2 + 1; // 11
+        int w = radius * 2 - 1; // 9
         int h = w;
-        int cx = radius;
-        int cy = radius;
+        int cx = radius - 1;
+        int cy = radius - 1;
 
         TETile[][] layout = new TETile[w][h];
         fill(layout, Tileset.NOTHING);
 
         fillCircle(layout, cx, cy, radius, Tileset.WALL);
-        fillCircle(layout, cx, cy, radius - 1, Tileset.FLOOR);
+        fillCircle(layout, cx, cy, radius - 1, Tileset.SNOW);
+
+        // Add treasure in the middle
+        layout[w/2][h/2] = Tileset.TREASURE;
+
+        // 4 Pilars around the treasure
+        for (int x = w/2 - 1; x <= w/2 + 1; x += 2) {
+            for (int y = h/2 - 1; y <= h/2 + 1; y += 2) {
+                layout[x][y] = Tileset.WALL;
+            }
+        }
 
         Point topDoor = new Point(cx, h - 1);
         Point bottomDoor = new Point(cx, 0);
@@ -748,27 +885,41 @@ public final class RoomTemplates {
         drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT);
-        Set<RoomType> roomTypes = EnumSet.of(RoomType.SPECIAL);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.ROUND, RoomType.TREASURE);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
     }
 
     /**
-     * Large round room (diameter 15).
+     * Large round room (diameter 14).
      * Index in ALL_TEMPLATES: 19.
+     * Treasure in the middle.
+     * Grass in the inner wall.
      */
-    private static RoomTemplate makeLargeRoundRoom() {
+    private static RoomTemplate makeLargeRoundTreasureRoom() {
         int radius = 7;
-        int w = radius * 2 + 1; // 15
+        int w = radius * 2 - 1; // 13
         int h = w;
-        int cx = radius;
-        int cy = radius;
+        int cx = radius - 1;
+        int cy = radius - 1;
 
         TETile[][] layout = new TETile[w][h];
         fill(layout, Tileset.NOTHING);
 
+        // Outer wall
         fillCircle(layout, cx, cy, radius, Tileset.WALL);
         fillCircle(layout, cx, cy, radius - 1, Tileset.FLOOR);
+
+        // Inner wall
+        fillCircle(layout, cx, cy, radius - 3, Tileset.WALL);
+        fillCircle(layout, cx, cy, radius - 4, Tileset.GRASS);
+        layout[2][h / 2] = Tileset.FLOOR;
+        layout[radius - 1][2] = Tileset.FLOOR;
+        layout[radius - 1][h - 3] = Tileset.FLOOR;
+        layout[w - 3][h / 2] = Tileset.FLOOR;
+
+        // Treasure in the middle
+        layout[w/2][h/2] = Tileset.TREASURE;
 
         Point topDoor = new Point(cx, h - 1);
         Point bottomDoor = new Point(cx, 0);
@@ -778,7 +929,7 @@ public final class RoomTemplates {
         drawLockedDoors(doors, layout);
 
         Set<Direction> dirs = EnumSet.of(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT);
-        Set<RoomType> roomTypes = EnumSet.of(RoomType.BIG, RoomType.SPECIAL);
+        Set<RoomType> roomTypes = EnumSet.of(RoomType.BIG, RoomType.ROUND, RoomType.TREASURE);
 
         return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
     }
@@ -902,15 +1053,18 @@ public final class RoomTemplates {
 
     /**
      * Add walls around all floor tiles in the layout.
-     * Any NOTHING tile that is a 4-neighbor to a FLOOR tile becomes WALL.
+     * Any NOTHING tile that is a 4-neighbor to the specified floor tile becomes WALL.
+     * 
+     * @param layout The layout to modify
+     * @param floorTile The tile type to treat as floor (e.g., Tileset.FLOOR, Tileset.SAND, Tileset.GRASS, Tileset.SNOW)
      */
-    private static void addWallsAroundFloor(TETile[][] layout) {
+    private static void addWallsAroundFloor(TETile[][] layout, TETile floorTile) {
         int w = layout.length;
         int h = layout[0].length;
 
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                if (layout[x][y] == Tileset.FLOOR) {
+                if (layout[x][y] == floorTile) {
                     for (Direction d : Direction.values()) {
                         int nx = x + d.dx;
                         int ny = y + d.dy;

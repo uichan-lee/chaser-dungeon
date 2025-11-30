@@ -14,7 +14,7 @@ public class Main {
        
         long seed = 123456789L;
 
-        TETile[][] world = World.generateWorld(seed);
-        ter.renderFrame(world);
+//        TETile[][] world = World.generateWorld(seed);
+//        ter.renderFrame(world);
     }
 }
