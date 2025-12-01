@@ -5,11 +5,7 @@ import tileengine.TETile;
 import tileengine.Tileset;
 import edu.princeton.cs.algs4.StdDraw;
 
-<<<<<<< HEAD
-import java.awt.*;
-=======
 import java.awt.Point;
->>>>>>> anikethinteractivity
 
 public class GameLoop {
 

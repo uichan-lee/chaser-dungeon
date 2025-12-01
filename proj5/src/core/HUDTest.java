@@ -1,13 +1,11 @@
 package core;
 
-import demo.BoringWorldDemo;
 import edu.princeton.cs.algs4.StdDraw;
 import tileengine.TERenderer;
 import tileengine.TETile;
 import tileengine.Tileset;
 
 import java.awt.*;
-import java.util.Set;
 
 public class HUDTest {
     // Fonts
@@ -356,18 +354,36 @@ public class HUDTest {
         WorldGenerator gen = new WorldGenerator(width, height, seed);
         TETile[][] world = gen.generate();
         
+        // Find avatar position and create Player
+        Player player = findPlayer(world);
+        
         renderer.renderFrame(world);
 
-        runGameLoop(world);
+        runGameLoop(world, player);
+    }
+    
+    /**
+     * Finds the avatar in the world and creates a Player object at that position.
+     */
+    private static Player findPlayer(TETile[][] world) {
+        for (int x = 0; x < world.length; x++) {
+            for (int y = 0; y < world[0].length; y++) {
+                if (world[x][y].equals(Tileset.AVATAR)) {
+                    return new Player(x, y);
+                }
+            }
+        }
+        throw new RuntimeException("Avatar not found in world");
     }
 
 
     /**
-     * Check where mouse is, and update HUD
+     * Main game loop: handles player movement and updates HUD based on mouse position
      *
-     * @param world
+     * @param world the world tile map
+     * @param player the player object
      */
-    private static void runGameLoop(TETile[][] world) {
+    private static void runGameLoop(TETile[][] world, Player player) {
         int worldWidth;
         int worldHeight;
 
@@ -386,18 +402,90 @@ public class HUDTest {
         clearHUDArea(worldWidth, worldHeight);
         StdDraw.show();
 
-        // Main loop: continually update HUD based on mouse position
+        // Main loop: handle input, update world, render, and update HUD
         while (true) {
-            updateHUDWithMouse(world, worldWidth, worldHeight);
+            // Handle keyboard input for player movement
+            handleInput(world, player);
+            
+            // Clear screen and render everything in one batch
+            StdDraw.clear(StdDraw.BLACK);
+            
+            // Render the world tiles (without clearing/showing)
+            renderer.drawTiles(world);
+            
+            // Update HUD based on mouse position (without showing)
+            updateHUDWithMouse(world, worldWidth, worldHeight, false);
+            
+            // Show everything at once
+            StdDraw.show();
+            
             StdDraw.pause(30); // ~30 FPS, avoids busy-waiting
+        }
+    }
+    
+    /**
+     * Handles keyboard input for player movement (W/A/S/D).
+     * Based on GameLoop.handleInput logic.
+     */
+    private static void handleInput(TETile[][] world, Player player) {
+        if (!StdDraw.hasNextKeyTyped()) {
+            return;
+        }
+        
+        char c = Character.toUpperCase(StdDraw.nextKeyTyped());
+        switch (c) {
+            case 'W':
+                movePlayer(player, Direction.UP, world);
+                break;
+            case 'A':
+                movePlayer(player, Direction.LEFT, world);
+                break;
+            case 'S':
+                movePlayer(player, Direction.DOWN, world);
+                break;
+            case 'D':
+                movePlayer(player, Direction.RIGHT, world);
+                break;
+        }
+    }
+    
+    /**
+     * Moves the player in the specified direction if the target tile is walkable.
+     * Based on GameLoop.move logic.
+     */
+    private static void movePlayer(Player player, Direction dir, TETile[][] world) {
+        player.facing = dir;
+        
+        int nx = player.pos.x + dir.dx;
+        int ny = player.pos.y + dir.dy;
+        
+        // Check bounds
+        if (nx < 0 || nx >= world.length || ny < 0 || ny >= world[0].length) {
+            return;
+        }
+        
+        // Allowed floor types (same as GameLoop.move)
+        if (world[nx][ny].equals(Tileset.FLOOR) || world[nx][ny].equals(Tileset.UNLOCKED_DOOR)) {
+            // Clear old location
+            world[player.pos.x][player.pos.y] = Tileset.FLOOR;
+            
+            // Move player
+            player.pos = new java.awt.Point(nx, ny);
+            
+            // Place avatar tile
+            world[nx][ny] = Tileset.AVATAR;
         }
     }
 
     /**
-     * Clears and redraws the HUD area, then shows information about
-     * the tile currently under the mouse cursor (if any).
+     * Draws the HUD area and shows information about the tile currently under the mouse cursor (if any).
+     * 
+     * @param world the world tile map
+     * @param worldWidth width of the world
+     * @param worldHeight height of the world
+     * @param showNow if true, calls StdDraw.show() at the end; if false, just draws without showing
      */
-    private static void updateHUDWithMouse(TETile[][] world, int worldWidth, int worldHeight) {
+    private static void updateHUDWithMouse(TETile[][] world, int worldWidth, int worldHeight, boolean showNow) {
         // Redraw HUD background
         clearHUDArea(worldWidth, worldHeight);
 
@@ -428,7 +516,9 @@ public class HUDTest {
             }
         }
 
-        StdDraw.show();
+        if (showNow) {
+            StdDraw.show();
+        }
     }
 
     private static void clearHUDArea(int worldWidth, int worldHeight) {
@@ -542,13 +632,4 @@ public class HUDTest {
         return "";
     }
 
-    /**
-     * Handle player movement in 4 directions (w:↑, a:←, s:↓, d:→)
-     * Renders tile below player, and memorizes new tile below player tile
-     * @param c
-     * @param world
-     */
-//    private static void handlePlayerMovement(char c, TETile[][] world) {
-//
-//    }
 }
