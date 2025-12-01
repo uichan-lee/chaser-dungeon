@@ -5,6 +5,8 @@ import tileengine.TERenderer;
 import tileengine.Tileset;
 import edu.princeton.cs.algs4.StdDraw;
 
+import java.awt.*;
+
 public class GameLoop {
 
     private TERenderer render = new TERenderer();

@@ -60,12 +60,9 @@ public class WorldGenerator {
             for (int y = 0; y < height; y++) {
                 world[x][y] = Tileset.NOTHING;
             }
-    public List<Room> getRooms() {
-        return rooms;
-    }
         }
     }
-
+    
     /**
      * Entry point: build the world and return the tile map.
      */
