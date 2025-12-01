@@ -1,25 +1,29 @@
 package core;
 
-import tileengine.TETile;
 import tileengine.TERenderer;
+import tileengine.TETile;
 import tileengine.Tileset;
 import edu.princeton.cs.algs4.StdDraw;
 
+<<<<<<< HEAD
 import java.awt.*;
+=======
+import java.awt.Point;
+>>>>>>> anikethinteractivity
 
 public class GameLoop {
 
-    private TERenderer render = new TERenderer();
+    private TERenderer renderer = new TERenderer();
 
     public void run(TETile[][] world, Player p) {
         int width = world.length;
         int height = world[0].length;
 
-        render.initialize(width, height);
+        renderer.initialize(width, height);
 
         while (true) {
             handleInput(world, p);
-            render.renderFrame(world);
+            renderer.renderFrame(world);
         }
     }
 
@@ -33,6 +37,14 @@ public class GameLoop {
             case 'S' -> move(p, Direction.DOWN, world);
             case 'D' -> move(p, Direction.RIGHT, world);
             case 'I' -> interact(p, world);
+            case ':' -> {
+                while (!StdDraw.hasNextKeyTyped()) { }
+                char q = Character.toUpperCase(StdDraw.nextKeyTyped());
+                if (q == 'Q') {
+                    SaveLoad.save(world, p);
+                    System.exit(0);
+                }
+            }
         }
     }
 
@@ -42,17 +54,23 @@ public class GameLoop {
         int nx = p.pos.x + dir.dx;
         int ny = p.pos.y + dir.dy;
 
-        if (world[nx][ny].equals(Tileset.FLOOR) || world[nx][ny].equals(Tileset.UNLOCKED_DOOR)) {
+        // Allowed floor types
+        if (world[nx][ny] == Tileset.FLOOR || world[nx][ny] == Tileset.UNLOCKED_DOOR) {
+
+            // clear old location
             world[p.pos.x][p.pos.y] = Tileset.FLOOR;
 
-            p.pos.setLocation(nx, ny);
+            // move player
+            p.pos = new Point(nx, ny);
+
+            // place avatar tile
             world[nx][ny] = Tileset.AVATAR;
         }
     }
 
     private void interact(Player p, TETile[][] world) {
         Point f = p.frontTile();
-        if (world[f.x][f.y].equals(Tileset.LOCKED_DOOR)) {
+        if (world[f.x][f.y] == Tileset.LOCKED_DOOR) {
             world[f.x][f.y] = Tileset.UNLOCKED_DOOR;
         }
     }

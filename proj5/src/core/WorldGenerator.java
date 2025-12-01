@@ -60,9 +60,20 @@ public class WorldGenerator {
             for (int y = 0; y < height; y++) {
                 world[x][y] = Tileset.NOTHING;
             }
+<<<<<<< HEAD
         }
     }
     
+=======
+
+    }
+
+
+    }
+    public List<Room> getRooms() {
+        return rooms;
+    }
+>>>>>>> anikethinteractivity
     /**
      * Entry point: build the world and return the tile map.
      */
@@ -522,7 +533,7 @@ public class WorldGenerator {
                 if (connectedDoors.contains(doorWorld)) {
                     world[doorWorld.x][doorWorld.y] = Tileset.UNLOCKED_DOOR;
                 } else {
-                    world[doorWorld.x][doorWorld.y] = Tileset.WALL;
+                    world[doorWorld.x][doorWorld.y] = Tileset.LOCKED_DOOR;
                 }
             }
         }

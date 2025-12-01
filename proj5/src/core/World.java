@@ -7,22 +7,24 @@ import tileengine.Tileset;
 import java.util.List;
 
 public class World {
-    private static final int WIDTH = 100;
-    private static final int HEIGHT = 60;
-    private static final List<RoomTemplate> ROOM_TEMPLATES = RoomTemplates.ALL_TEMPLATES;
-
     public static void main(String[] args) {
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
+        int WIDTH = 100;
+        int HEIGHT = 60;
+        long seed = 12345L;
 
-        long seed = 56125848385792635L; 
         WorldGenerator gen = new WorldGenerator(WIDTH, HEIGHT, seed);
         TETile[][] world = gen.generate();
 
-        ter.renderFrame(world);
-    }
+        // Make a player at the center
+        Player p = new Player(WIDTH / 2, HEIGHT / 2);
 
+        // Replace tile with avatar
+        world[p.pos.x][p.pos.y] = Tileset.AVATAR;
+
+        new GameLoop().run(world, p);
+    }
 }
+
 
 /*
 Testing seeds:
