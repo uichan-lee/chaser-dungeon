@@ -79,7 +79,7 @@ public class Room {
     /**
      * Checks whether this room fits entirely within the world bounds.
      * World coordinates are assumed to be valid in
-     * {@code [1, worldWidth - 1)} × {@code [1, worldHeight - 1)}.
+     * {@code [1, worldWidth - 1)} × {@code [1, worldHeight - 2)}.
      *
      * @param worldWidth  total world width
      * @param worldHeight total world height
@@ -89,7 +89,7 @@ public class Room {
         return worldX >= 1
                 && worldY >= 1
                 && maxX() <= worldWidth - 1
-                && maxY() <= worldHeight - 1;
+                && maxY() <= worldHeight - 2; // Space for HUD (must match HUD_HEIGHT)
     }
 
     /**
