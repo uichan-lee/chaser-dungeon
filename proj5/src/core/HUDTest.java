@@ -1,19 +1,23 @@
 package core;
 
+import demo.BoringWorldDemo;
 import edu.princeton.cs.algs4.StdDraw;
 import tileengine.TERenderer;
 import tileengine.TETile;
+import tileengine.Tileset;
 
 import java.awt.*;
+import java.util.Set;
 
 public class HUDTest {
-
     // Fonts
     public static final Font SMALL_WARNING_FONT = new Font("DialogInput", Font.BOLD, 20);
     public static final Font TITLE_FONT = new Font("DialogInput", Font.BOLD, 70);
     public static final Font MENU_FONT = new Font("DialogInput", Font.BOLD, 40);
     public static final Font SEED_FONT = new Font("DialogInput", Font.PLAIN, 20);
     public static final Font MINI_FONT = new Font("DialogInput", Font.ITALIC, 12);
+    public static final Font HUD_FONT = new Font("DialogInput", Font.PLAIN, 14);
+    public static final Font HUD_TAG_FONT = new Font("DialogInput", Font.PLAIN, 10);
 
     // World size constants
     private static final int SMALL_WIDTH = 50;
@@ -24,13 +28,23 @@ public class HUDTest {
 
     private static final int BIG_WIDTH = 110;
     private static final int BIG_HEIGHT = 70;
+
+    private static int SIZE; //0 = Small; 1 = Medium; 2 = Big
+
     
     private static final int MENU_WIDTH = 56;
     private static final int MENU_HEIGHT = 50;
     private static final int SEED_MAXIMUM_LENGTH = 18;
 
+//    // Tile under Player. Used to render after player move.
+//    private static TETile playerPositionTile = Tileset.FLOOR;
+
+    // world renderer
+    private static final TERenderer renderer = new TERenderer();
+
+
+
     public static void main(String[] args) {
-        TERenderer renderer = new TERenderer();
         renderer.initialize(MENU_WIDTH, MENU_HEIGHT);
 
         drawTitle();
@@ -38,7 +52,6 @@ public class HUDTest {
         StdDraw.show();
 
         mainMenu();
-
     }
 
     /**
@@ -106,7 +119,6 @@ public class HUDTest {
         StdDraw.setFont(TITLE_FONT);
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.93, "CS 61B: BYOW");
     }
-
 
     private static void drawMenu() {
         drawMenuBox();
@@ -204,13 +216,13 @@ public class HUDTest {
     private static void clearMessageArea() {
         // clear area
         StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.1, (double) MENU_WIDTH * 0.35, 2);
+        StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.8, (double) MENU_WIDTH * 0.35, 2);
     }
 
     private static void addOrangeMessage(String text) {
         StdDraw.setPenColor(StdDraw.ORANGE);
         StdDraw.setFont(SMALL_WARNING_FONT);
-        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.1, text);
+        StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.8, text);
     }
 
     private static void loadGame() {
@@ -306,10 +318,13 @@ public class HUDTest {
             char c = StdDraw.nextKeyTyped();
             
             if (c == 's' || c == 'S') {
+                SIZE = 0;
                 return new int[]{SMALL_WIDTH, SMALL_HEIGHT};
             } else if (c == 'm' || c == 'M') {
+                SIZE = 1;
                 return new int[]{MEDIUM_WIDTH, MEDIUM_HEIGHT};
             } else if (c == 'b' || c == 'B') {
+                SIZE = 2;
                 return new int[]{BIG_WIDTH, BIG_HEIGHT};
             } else if (c == 'n' || c == 'N') {
                 return null;
@@ -329,19 +344,211 @@ public class HUDTest {
 
     /**
      * Generates a world using the given seed and renders it.
+     * After rendering,
      * 
      * @param seed the seed for world generation
      * @param width the width of the world
      * @param height the height of the world
      */
     private static void generateAndRenderWorld(long seed, int width, int height) {
-        TERenderer renderer = new TERenderer();
         renderer.initialize(width, height);
         
         WorldGenerator gen = new WorldGenerator(width, height, seed);
         TETile[][] world = gen.generate();
         
         renderer.renderFrame(world);
+
+        runGameLoop(world);
     }
 
+
+    /**
+     * Check where mouse is, and update HUD
+     *
+     * @param world
+     */
+    private static void runGameLoop(TETile[][] world) {
+        int worldWidth;
+        int worldHeight;
+
+        if (SIZE == 0) {
+            worldWidth = SMALL_WIDTH;
+            worldHeight = SMALL_HEIGHT;
+        } else if (SIZE == 1) {
+            worldWidth = MEDIUM_WIDTH;
+            worldHeight = MEDIUM_HEIGHT;
+        } else {
+            worldWidth = BIG_WIDTH;
+            worldHeight = BIG_HEIGHT;
+        }
+
+        // Initial HUD background
+        clearHUDArea(worldWidth, worldHeight);
+        StdDraw.show();
+
+        // Main loop: continually update HUD based on mouse position
+        while (true) {
+            updateHUDWithMouse(world, worldWidth, worldHeight);
+            StdDraw.pause(30); // ~30 FPS, avoids busy-waiting
+        }
+    }
+
+    /**
+     * Clears and redraws the HUD area, then shows information about
+     * the tile currently under the mouse cursor (if any).
+     */
+    private static void updateHUDWithMouse(TETile[][] world, int worldWidth, int worldHeight) {
+        // Redraw HUD background
+        clearHUDArea(worldWidth, worldHeight);
+
+        double mouseX = StdDraw.mouseX();
+        double mouseY = StdDraw.mouseY();
+
+        int tileX = (int) Math.floor(mouseX);
+        int tileY = (int) Math.floor(mouseY);
+
+        // Only show info if mouse is within world bounds and not in HUD area
+        if (tileX >= 0 && tileX < worldWidth && tileY >= 0 && tileY < worldHeight - 2) {
+            TETile tile = world[tileX][tileY];
+            if (tile != null) {
+                String name = getFriendlyTileName(tile);
+                String tag = getTileTag(tile);
+
+                StdDraw.setPenColor(StdDraw.WHITE);
+
+                // Main tile name, slightly above center of HUD bar
+                StdDraw.setFont(HUD_FONT);
+                StdDraw.text(worldWidth / 2.0, worldHeight - 0.9, name);
+
+                // Smaller tag text just below the name
+                if (!tag.isEmpty()) {
+                    StdDraw.setFont(HUD_TAG_FONT);
+                    StdDraw.text(worldWidth / 2.0, worldHeight - 1.5, "(" + tag + ")");
+                }
+            }
+        }
+
+        StdDraw.show();
+    }
+
+    private static void clearHUDArea(int worldWidth, int worldHeight) {
+        // HUD bar exactly matches the non-playable HUD area (height = 2 tiles)
+        StdDraw.setPenColor(52, 61, 82);
+        StdDraw.filledRectangle(worldWidth / 2.0, worldHeight - 1,
+                worldWidth / 2.0, 1);
+    }
+
+    /**
+     * Converts a TETile into a short, user-friendly name for the HUD.
+     */
+    private static String getFriendlyTileName(TETile tile) {
+        if (tile == null) {
+            return "";
+        }
+
+        // Prefer matching against known tiles so we can control capitalization.
+        if (tile.equals(Tileset.FLOOR)) {
+            return "Floor";
+        } else if (tile.equals(Tileset.GRASS)) {
+            return "Grass";
+        } else if (tile.equals(Tileset.FLOWER)) {
+            return "Flower";
+        } else if (tile.equals(Tileset.SAND)) {
+            return "Sand";
+        } else if (tile.equals(Tileset.SNOW)) {
+            return "Snow";
+        } else if (tile.equals(Tileset.WALL)) {
+            return "Wall";
+        } else if (tile.equals(Tileset.NOTHING)) {
+            return "Nothing";
+        } else if (tile.equals(Tileset.WATER)) {
+            return "Water";
+        } else if (tile.equals(Tileset.MOUNTAIN)) {
+            return "Mountain";
+        } else if (tile.equals(Tileset.TREE)) {
+            return "Tree";
+        } else if (tile.equals(Tileset.LOCKED_DOOR)) {
+            return "Locked Door";
+        } else if (tile.equals(Tileset.UNLOCKED_DOOR)) {
+            return "Unlocked Door";
+        } else if (tile.equals(Tileset.CELL)) {
+            return "Cell";
+        } else if (tile.equals(Tileset.BUSH)) {
+            return "Bush";
+        } else if (tile.equals(Tileset.STATUE)) {
+            return "Statue";
+        } else if (tile.equals(Tileset.CRATE)) {
+            return "Crate";
+        } else if (tile.equals(Tileset.BOOKSHELF)) {
+            return "Bookshelf";
+        } else if (tile.equals(Tileset.SNOWMAN)) {
+            return "Snowman";
+        } else if (tile.equals(Tileset.TREASURE)) {
+            return "Treasure";
+        } else if (tile.equals(Tileset.PORTAL)) {
+            return "Portal";
+        } else if (tile.equals(Tileset.LAVA)) {
+            return "Lava";
+        } else if (tile.equals(Tileset.SPIKE)) {
+            return "Spike";
+        } else if (tile.equals(Tileset.AVATAR)) {
+            return "Player";
+        }
+
+        // Fallback: use description() with first letter capitalized
+        String desc = tile.description();
+        if (desc == null || desc.isEmpty()) {
+            return "";
+        }
+        return desc.substring(0, 1).toUpperCase() + desc.substring(1);
+    }
+
+    /**
+     * Returns a short category tag for the given tile, e.g. "dangerous", "interactable",
+     * "unwalkable", etc. Used for the tiny HUD text under the tile name.
+     * 
+     * Categories follow WorldGenerator's logic for isWalkableTile/isBlockingTile,
+     * tagging as "dangerous", "interactable", or "unwalkable".
+     */
+    private static String getTileTag(TETile tile) {
+        if (tile == null) {
+            return "";
+        }
+
+        // Dangerous tiles (highest priority)
+        if (tile.equals(Tileset.LAVA) || tile.equals(Tileset.SPIKE)) {
+            return "dangerous";
+        }
+
+        // Interactable tiles
+        if (tile.equals(Tileset.TREASURE)
+                || tile.equals(Tileset.PORTAL)
+                || tile.equals(Tileset.LOCKED_DOOR)
+                || tile.equals(Tileset.UNLOCKED_DOOR)) {
+            return "interactable";
+        }
+
+        // Unwalkable tiles (matches WorldGenerator.isBlockingTile)
+        if (tile.equals(Tileset.AVATAR)
+                || tile.equals(Tileset.WALL)
+                || tile.equals(Tileset.WATER)
+                || tile.equals(Tileset.LOCKED_DOOR)
+                || tile.equals(Tileset.UNLOCKED_DOOR)
+                || tile.equals(Tileset.MOUNTAIN)
+                || tile.equals(Tileset.TREE)) {
+            return "unwalkable";
+        }
+
+        return "";
+    }
+
+    /**
+     * Handle player movement in 4 directions (w:↑, a:←, s:↓, d:→)
+     * Renders tile below player, and memorizes new tile below player tile
+     * @param c
+     * @param world
+     */
+//    private static void handlePlayerMovement(char c, TETile[][] world) {
+//
+//    }
 }

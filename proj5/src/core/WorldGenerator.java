@@ -21,6 +21,9 @@ import java.util.*;
  */
 public class WorldGenerator {
 
+    // Number of tiles reserved at the top for HUD (must match actual HUD drawing height)
+    private static final int HUD_HEIGHT = 2;
+
     private final int width;
     private final int height;
     private final TETile[][] world;
@@ -86,9 +89,10 @@ public class WorldGenerator {
      */
     private Room placeStartingRoom() {
         RoomTemplate t = RoomTemplates.ALL_TEMPLATES.get(0); // makeStartingRoom()
-        // Center the room in the world
+        // Center the room in the usable world area (exclude HUD region at top)
+        int usableHeight = height - HUD_HEIGHT;
         int worldX = (width - t.width) / 2;
-        int worldY = (height - t.height) / 2;
+        int worldY = (usableHeight - t.height) / 2;
         Room r = new Room(t, worldX, worldY);
         registerRoomFloors(r);
         return r;
@@ -234,11 +238,11 @@ public class WorldGenerator {
     }
 
     /**
-     * Check if a point is not on the edge
+     * Check if a point is not on the edge and stays below the HUD area.
      */
     private boolean isInsideFloorBounds(Point p) {
         return p.x > 0 && p.x < width - 1
-                && p.y > 0 && p.y < height - 1;
+                && p.y > 0 && p.y < height - HUD_HEIGHT;
     }
 
     /**
@@ -523,6 +527,8 @@ public class WorldGenerator {
             }
         }
     }
+
+
 
     /* =====================================================
      *  Helper: corridor result
