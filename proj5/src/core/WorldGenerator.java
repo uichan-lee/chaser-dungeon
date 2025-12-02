@@ -93,6 +93,9 @@ public class WorldGenerator {
         
         // Place chaser at a random walkable location (not on avatar)
         placeChaser(avatarX, avatarY);
+        
+        // Place portal in the farthest room from the starting room
+        placePortal(avatarX, avatarY);
 
         return world;
     }
@@ -147,6 +150,65 @@ public class WorldGenerator {
      */
     public TETile getChaserTileUnder() {
         return chaserTileUnder;
+    }
+    
+    /**
+     * Places a portal in the farthest room from the starting position.
+     * The portal is placed on a random walkable tile within that room.
+     */
+    private void placePortal(int startX, int startY) {
+        if (rooms.isEmpty()) {
+            return;
+        }
+        
+        // Find the farthest room from the starting position
+        Room farthestRoom = null;
+        double maxDistance = -1;
+        
+        for (Room room : rooms) {
+            // Calculate room center
+            int roomCenterX = room.worldX + room.template.width / 2;
+            int roomCenterY = room.worldY + room.template.height / 2;
+            
+            // Calculate Manhattan distance from start to room center
+            int distance = Math.abs(roomCenterX - startX) + Math.abs(roomCenterY - startY);
+            
+            if (distance > maxDistance) {
+                maxDistance = distance;
+                farthestRoom = room;
+            }
+        }
+        
+        if (farthestRoom == null) {
+            return;
+        }
+        
+        // Collect all walkable tiles in the farthest room
+        List<Point> walkableTiles = new ArrayList<>();
+        for (int dx = 0; dx < farthestRoom.template.width; dx++) {
+            for (int dy = 0; dy < farthestRoom.template.height; dy++) {
+                int x = farthestRoom.worldX + dx;
+                int y = farthestRoom.worldY + dy;
+                
+                // Check bounds
+                if (x >= 0 && x < width && y >= 0 && y < height - HUD_HEIGHT) {
+                    TETile tile = world[x][y];
+                    // Only place on walkable tiles, and not on avatar or chaser
+                    if (isWalkableTile(tile) && 
+                        !tile.equals(Tileset.AVATAR) && 
+                        !tile.equals(Tileset.CHASER)) {
+                        walkableTiles.add(new Point(x, y));
+                    }
+                }
+            }
+        }
+        
+        // Randomly choose a walkable tile and place portal
+        if (!walkableTiles.isEmpty()) {
+            int idx = RandomUtils.uniform(rand, walkableTiles.size());
+            Point portalPos = walkableTiles.get(idx);
+            world[portalPos.x][portalPos.y] = Tileset.PORTAL;
+        }
     }
 
     /**

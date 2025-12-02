@@ -830,6 +830,11 @@ public class World {
             world[front.x][front.y].draw(front.x, front.y);
             StdDraw.show();
         }
+        
+        // Interact with portal (clear game)
+        if (frontTile.equals(Tileset.PORTAL)) {
+            showClearScreen(world.length, world[0].length);
+        }
     }
     
     /**
@@ -982,13 +987,14 @@ public class World {
             }
         }
         
-        // Check if player can interact with treasure chest (front tile is TREASURE)
+        // Check if player can interact with treasure chest or portal (front tile is TREASURE or PORTAL)
         java.awt.Point frontTile = player.frontTile();
         boolean showInteractMessage = false;
         if (frontTile.x >= 0 && frontTile.x < worldWidth && 
             frontTile.y >= 0 && frontTile.y < worldHeight - 2) {
             TETile frontTileType = world[frontTile.x][frontTile.y];
-            if (frontTileType != null && frontTileType.equals(Tileset.TREASURE)) {
+            if (frontTileType != null && 
+                (frontTileType.equals(Tileset.TREASURE) || frontTileType.equals(Tileset.PORTAL))) {
                 // Display "Press I to Interact" on the left side of HUD
                 StdDraw.setPenColor(StdDraw.CYAN);
                 StdDraw.setFont(HUD_FONT);
@@ -1015,6 +1021,34 @@ public class World {
         drawPushAbilityIcon(worldWidth, worldHeight, player);
 
         StdDraw.show();
+    }
+    
+    /**
+     * Displays Clear/Game Complete message and waits before exiting.
+     */
+    private static void showClearScreen(int worldWidth, int worldHeight) {
+        // Clear screen
+        StdDraw.clear(StdDraw.BLACK);
+        
+        // Draw "CLEAR" or "GAME COMPLETE" message
+        StdDraw.setPenColor(StdDraw.GREEN);
+        StdDraw.setFont(new java.awt.Font("Monaco", java.awt.Font.BOLD, 60));
+        StdDraw.text(worldWidth / 2.0, worldHeight / 2.0 + 1, "CLEAR!");
+        
+        StdDraw.setPenColor(StdDraw.WHITE);
+        StdDraw.setFont(new java.awt.Font("Monaco", java.awt.Font.PLAIN, 24));
+        StdDraw.text(worldWidth / 2.0, worldHeight / 2.0 - 1, "Game Complete");
+        
+        StdDraw.show();
+        
+        // Wait a bit before exiting
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            // Ignore
+        }
+        
+        System.exit(0);
     }
     
     /**
