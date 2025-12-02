@@ -153,60 +153,125 @@ public class WorldGenerator {
     }
     
     /**
-     * Places a portal in the farthest room from the starting position.
-     * The portal is placed on a random walkable tile within that room.
+     * Places a portal in a room where the Chaser has a shorter or equal path distance
+     * to the portal compared to the Player. This ensures the Chaser can always reach
+     * the portal before or at the same time as the Player, making the game more challenging.
+     * If no such location exists, places the portal in the farthest valid location.
      */
     private void placePortal(int startX, int startY) {
-        if (rooms.isEmpty()) {
+        if (rooms.isEmpty() || chaserPosition == null) {
             return;
         }
         
-        // Find the farthest room from the starting position
-        Room farthestRoom = null;
-        double maxDistance = -1;
-        
+        // Collect all candidate portal positions from all rooms
+        List<Point> allCandidates = new ArrayList<>();
         for (Room room : rooms) {
-            // Calculate room center
-            int roomCenterX = room.worldX + room.template.width / 2;
-            int roomCenterY = room.worldY + room.template.height / 2;
-            
-            // Calculate Manhattan distance from start to room center
-            int distance = Math.abs(roomCenterX - startX) + Math.abs(roomCenterY - startY);
-            
-            if (distance > maxDistance) {
-                maxDistance = distance;
-                farthestRoom = room;
-            }
-        }
-        
-        if (farthestRoom == null) {
-            return;
-        }
-        
-        // Collect all walkable tiles in the farthest room
-        List<Point> walkableTiles = new ArrayList<>();
-        for (int dx = 0; dx < farthestRoom.template.width; dx++) {
-            for (int dy = 0; dy < farthestRoom.template.height; dy++) {
-                int x = farthestRoom.worldX + dx;
-                int y = farthestRoom.worldY + dy;
-                
-                // Check bounds
-                if (x >= 0 && x < width && y >= 0 && y < height - HUD_HEIGHT) {
-                    TETile tile = world[x][y];
-                    // Only place on walkable tiles, and not on avatar or chaser
-                    if (isWalkableTile(tile) && 
-                        !tile.equals(Tileset.AVATAR) && 
-                        !tile.equals(Tileset.CHASER)) {
-                        walkableTiles.add(new Point(x, y));
+            for (int dx = 0; dx < room.template.width; dx++) {
+                for (int dy = 0; dy < room.template.height; dy++) {
+                    int x = room.worldX + dx;
+                    int y = room.worldY + dy;
+                    
+                    // Check bounds
+                    if (x >= 0 && x < width && y >= 0 && y < height - HUD_HEIGHT) {
+                        TETile tile = world[x][y];
+                        // Only place on walkable tiles, and not on avatar or chaser
+                        if (isWalkableTile(tile) && 
+                            !tile.equals(Tileset.AVATAR) && 
+                            !tile.equals(Tileset.CHASER)) {
+                            allCandidates.add(new Point(x, y));
+                        }
                     }
                 }
             }
         }
         
-        // Randomly choose a walkable tile and place portal
-        if (!walkableTiles.isEmpty()) {
-            int idx = RandomUtils.uniform(rand, walkableTiles.size());
-            Point portalPos = walkableTiles.get(idx);
+        if (allCandidates.isEmpty()) {
+            return;
+        }
+        
+        Point playerPos = new Point(startX, startY);
+        Point chaserPos = chaserPosition;
+        
+        // Find valid candidates where Chaser's path distance <= Player's path distance
+        List<Point> validCandidates = new ArrayList<>();
+        Map<Point, Integer> playerDistances = new HashMap<>();
+        Map<Point, Integer> chaserDistances = new HashMap<>();
+        
+        for (Point candidate : allCandidates) {
+            // Calculate path distances
+            List<Point> playerPath = Pathfinder.findPath(playerPos, candidate, world);
+            List<Point> chaserPath = Pathfinder.findPath(chaserPos, candidate, world);
+            
+            int playerDist = playerPath.size();
+            int chaserDist = chaserPath.size();
+            
+            // If player is at candidate, distance is 0
+            if (playerPos.equals(candidate)) {
+                playerDist = 0;
+            }
+            // If chaser is at candidate, distance is 0
+            if (chaserPos.equals(candidate)) {
+                chaserDist = 0;
+            }
+            
+            // If no path exists for player (and player is not at candidate), skip
+            if (playerDist == 0 && !playerPos.equals(candidate)) {
+                continue;
+            }
+            // If no path exists for chaser (and chaser is not at candidate), skip
+            if (chaserDist == 0 && !chaserPos.equals(candidate)) {
+                continue;
+            }
+            
+            playerDistances.put(candidate, playerDist);
+            chaserDistances.put(candidate, chaserDist);
+            
+            // Valid if Chaser's path distance <= Player's path distance
+            if (chaserDist <= playerDist) {
+                validCandidates.add(candidate);
+            }
+        }
+        
+        Point portalPos = null;
+        
+        if (!validCandidates.isEmpty()) {
+            // Among valid candidates, choose the one farthest from player (by path distance)
+            int maxPlayerDist = -1;
+            for (Point candidate : validCandidates) {
+                int dist = playerDistances.get(candidate);
+                if (dist > maxPlayerDist) {
+                    maxPlayerDist = dist;
+                    portalPos = candidate;
+                }
+            }
+        } else {
+            // Fallback: if no valid candidate exists, choose farthest from player (by path distance)
+            // among candidates that have valid paths
+            int maxPlayerDist = -1;
+            for (Point candidate : allCandidates) {
+                // Skip if player is at candidate (distance 0, not interesting)
+                if (playerPos.equals(candidate)) {
+                    continue;
+                }
+                
+                List<Point> playerPath = Pathfinder.findPath(playerPos, candidate, world);
+                int dist = playerPath.size();
+                
+                // Only consider candidates with valid paths
+                if (dist > 0 && dist > maxPlayerDist) {
+                    maxPlayerDist = dist;
+                    portalPos = candidate;
+                }
+            }
+            
+            // If still no valid position found, just pick any candidate
+            if (portalPos == null && !allCandidates.isEmpty()) {
+                portalPos = allCandidates.get(0);
+            }
+        }
+        
+        // Place portal at chosen position
+        if (portalPos != null) {
             world[portalPos.x][portalPos.y] = Tileset.PORTAL;
         }
     }
