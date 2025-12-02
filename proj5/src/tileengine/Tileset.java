@@ -47,6 +47,7 @@ public class Tileset {
     public static final TETile CRATE = new TETile('▤', new Color(139, 69, 19), new Color(60, 30, 10), "crate", 22);
     public static final TETile BOOKSHELF = new TETile('▦', new Color(205, 133, 63), new Color(110, 55, 20), "bookshelf", 23);
     public static final TETile SNOWMAN = new TETile('⛄', Color.cyan, Color.white, "snowman", 24);
+    public static final TETile OPENED_CHEST = new TETile('✷', new Color(139, 115, 38), new Color(200, 180, 120), "opened chest", 27);
 
     // =========================
     // Interactable Tiles

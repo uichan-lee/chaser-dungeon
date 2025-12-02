@@ -551,6 +551,7 @@ public class WorldGenerator {
                 && tile != Tileset.TREE
                 && tile != Tileset.PORTAL
                 && tile != Tileset.TREASURE
+                && tile != Tileset.OPENED_CHEST
                 && tile != Tileset.STATUE
                 && tile != Tileset.CRATE
                 && tile != Tileset.BOOKSHELF

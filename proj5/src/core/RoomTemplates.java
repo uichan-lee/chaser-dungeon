@@ -773,38 +773,6 @@ public final class RoomTemplates {
     }
 
     /**
-     * Diamond-shaped room.
-     * Not currently added to ALL_TEMPLATES.
-     */
-    private static RoomTemplate makeSmallDiamondRoom() {
-        int w = 7;
-        int h = 7;
-        TETile[][] layout = new TETile[w][h];
-
-        fill(layout, Tileset.NOTHING);
-
-        createDiamond(layout, 3, 3, 3, Tileset.WALL);
-        createDiamond(layout, 3, 3, 2, Tileset.SNOW);
-        
-        // Add decorative elements
-        layout[3][3] = Tileset.STATUE;
-        layout[2][3] = Tileset.FLOWER;
-        layout[4][3] = Tileset.FLOWER;
-
-        Point leftDoor = new Point(0, 3);
-        Point rightDoor = new Point(6, 3);
-        Point topDoor = new Point(3, 6);
-        Point bottomDoor = new Point(3, 0);
-        List<Point> doors = List.of(leftDoor, rightDoor, topDoor, bottomDoor);
-        drawLockedDoors(doors, layout);
-
-        Set<Direction> dirs = EnumSet.of(Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN);
-        Set<RoomType> roomTypes = EnumSet.of(RoomType.DIAMOND, RoomType.SMALL);
-
-        return new RoomTemplate(w, h, layout, doors, dirs, roomTypes);
-    }
-
-    /**
      * T-shaped room.
      * Width = 7, Height = 8
      * <p>
@@ -969,35 +937,6 @@ public final class RoomTemplates {
             for (int y = startY; y < startY + height && y < h; y++) {
                 if (x >= 0 && y >= 0) {
                     layout[x][y] = tile;
-                }
-            }
-        }
-    }
-
-    /**
-     * Create a diamond shape in the layout centered at the given position.
-     * The length parameter determines the size: if length=2, the diamond will have
-     * 4 vertical and horizontal length (area is 4 * 4 / 2 = 8).
-     * 
-     * @param layout  The layout to modify
-     * @param centerX Center x coordinate
-     * @param centerY Center y coordinate
-     * @param length  The length parameter (diamond extends length units in each
-     *                direction)
-     * @param tile    The tile to fill with
-     */
-    private static void createDiamond(TETile[][] layout, int centerX, int centerY, int length, TETile tile) {
-        int w = layout.length;
-        int h = layout[0].length;
-
-        for (int dx = -length; dx <= length; dx++) {
-            for (int dy = -length; dy <= length; dy++) {
-                if (Math.abs(dx) + Math.abs(dy) <= length) {
-                    int x = centerX + dx;
-                    int y = centerY + dy;
-                    if (x >= 0 && x < w && y >= 0 && y < h) {
-                        layout[x][y] = tile;
-                    }
                 }
             }
         }

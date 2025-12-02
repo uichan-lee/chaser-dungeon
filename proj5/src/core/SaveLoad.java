@@ -142,6 +142,9 @@ public class SaveLoad {
         if (c == Tileset.TREASURE.character()) return Tileset.TREASURE;
         if (c == Tileset.PORTAL.character()) return Tileset.PORTAL;
         
+        // Opened chest (unwalkable)
+        if (c == Tileset.OPENED_CHEST.character()) return Tileset.OPENED_CHEST;
+        
         // Damaging tiles
         if (c == Tileset.LAVA.character()) return Tileset.LAVA;
         if (c == Tileset.SPIKE.character()) return Tileset.SPIKE;

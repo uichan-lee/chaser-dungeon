@@ -4,7 +4,6 @@ import tileengine.TETile;
 
 import java.awt.Point;
 import java.util.Collections;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 

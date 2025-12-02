@@ -121,6 +121,7 @@ public class Pathfinder {
                 && !tile.equals(Tileset.TREE)
                 && !tile.equals(Tileset.PORTAL)
                 && !tile.equals(Tileset.TREASURE)
+                && !tile.equals(Tileset.OPENED_CHEST)
                 && !tile.equals(Tileset.STATUE)
                 && !tile.equals(Tileset.CRATE)
                 && !tile.equals(Tileset.BOOKSHELF)
