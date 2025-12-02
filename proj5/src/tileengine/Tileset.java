@@ -21,23 +21,55 @@ import java.awt.Color;
  */
 
 public class Tileset {
-    public static final TETile AVATAR = new TETile('@', Color.white, Color.black, "you", 0);
-    public static final TETile WALL = new TETile('#', new Color(216, 128, 128), Color.darkGray,
-            "wall", 1);
-    public static final TETile FLOOR = new TETile('·', new Color(128, 192, 128), Color.black, "floor", 2);
-    public static final TETile NOTHING = new TETile(' ', Color.black, Color.black, "nothing", 3);
-    public static final TETile GRASS = new TETile('"', Color.green, Color.black, "grass", 4);
-    public static final TETile WATER = new TETile('≈', Color.blue, Color.black, "water", 5);
-    public static final TETile FLOWER = new TETile('❀', Color.magenta, Color.pink, "flower", 6);
-    public static final TETile LOCKED_DOOR = new TETile('█', Color.orange, Color.black,
-            "locked door", 7);
-    public static final TETile UNLOCKED_DOOR = new TETile('▢', Color.orange, Color.black,
-            "unlocked door", 8);
-    public static final TETile SAND = new TETile('▒', Color.yellow, Color.black, "sand", 9);
-    public static final TETile MOUNTAIN = new TETile('▲', Color.gray, Color.black, "mountain", 10);
-    public static final TETile TREE = new TETile('♠', Color.green, Color.black, "tree", 11);
 
+    // =========================
+    // Walkable Tiles
+    // =========================
+    public static final TETile FLOOR = new TETile('·', new Color(128, 192, 128), Color.black, "floor", 2);
+    public static final TETile GRASS = new TETile('"', Color.green, Color.black, "grass", 4);
+    public static final TETile FLOWER = new TETile('❀', Color.magenta, Color.pink, "flower", 6);
+    public static final TETile SAND = new TETile('▒', new Color(251,236,93), Color.black, "sand", 9);
+    public static final TETile SNOW = new TETile('✧', Color.white, Color.lightGray, "snow", 25);
+    
+    // =========================
+    // Unwalkable/Blocking Tiles
+    // =========================
+    public static final TETile WALL = new TETile('#', new Color(216, 128, 128), Color.darkGray, "wall", 1);
+    public static final TETile NOTHING = new TETile(' ', Color.black, Color.black, "nothing", 3);
+    public static final TETile WATER = new TETile('≈', Color.blue, Color.black, "water", 5);
+    public static final TETile MOUNTAIN = new TETile('▲', Color.gray, Color.black, "mountain", 10);
+    public static final TETile TREE = new TETile('♠', new Color(0, 150, 0), Color.black, "tree", 11);
+    public static final TETile LOCKED_DOOR = new TETile('█', Color.orange, Color.black, "locked door", 7);
+    public static final TETile UNLOCKED_DOOR = new TETile('▢', Color.orange, Color.black, "unlocked door", 8);
     public static final TETile CELL = new TETile('█', Color.white, Color.black, "cell", 12);
+    public static final TETile BUSH = new TETile('♣', new Color(34, 139, 34), Color.black, "bush", 19);
+    public static final TETile STATUE = new TETile('Ω', Color.lightGray, Color.black, "statue", 21);
+    public static final TETile CRATE = new TETile('▤', new Color(139, 69, 19), new Color(60, 30, 10), "crate", 22);
+    public static final TETile BOOKSHELF = new TETile('▦', new Color(205, 133, 63), new Color(110, 55, 20), "bookshelf", 23);
+    public static final TETile SNOWMAN = new TETile('⛄', Color.cyan, Color.white, "snowman", 24);
+    public static final TETile OPENED_CHEST = new TETile('✷', new Color(139, 115, 38), new Color(200, 180, 120), "opened chest", 27);
+
+    // =========================
+    // Interactable Tiles
+    // =========================
+    public static final TETile TREASURE = new TETile('✶', new Color(212, 175, 55), new Color(250, 231, 181), "treasure", 13);
+    public static final TETile PORTAL = new TETile('⧉', Color.magenta, Color.darkGray, "portal", 18);
+
+    // =========================
+    // Damaging Tiles
+    // =========================
+    public static final TETile LAVA = new TETile('~', Color.red, Color.black, "lava", 15);
+    public static final TETile SPIKE = new TETile('†', Color.gray, Color.black, "spike", 17);
+
+    // =========================
+    // Player Tile
+    // =========================
+    public static final TETile AVATAR = new TETile('☺', Color.white, Color.black, "you", 0);
+    
+    // =========================
+    // Chaser Tile
+    // =========================
+    public static final TETile CHASER = new TETile('\u2639', Color.red, Color.black, "chaser", 26); // ☹ as chaser
 }
 
 

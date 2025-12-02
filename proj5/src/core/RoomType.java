@@ -11,6 +11,7 @@ public enum RoomType {
     SMALL,
     RING,
     DIAMOND,
+    ROUND,
     TREASURE,
     SPECIAL,
     // keep adding
