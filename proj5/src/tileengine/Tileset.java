@@ -28,7 +28,7 @@ public class Tileset {
     public static final TETile FLOOR = new TETile('·', new Color(128, 192, 128), Color.black, "floor", 2);
     public static final TETile GRASS = new TETile('"', Color.green, Color.black, "grass", 4);
     public static final TETile FLOWER = new TETile('❀', Color.magenta, Color.pink, "flower", 6);
-    public static final TETile SAND = new TETile('▒', Color.yellow, Color.black, "sand", 9);
+    public static final TETile SAND = new TETile('▒', new Color(251,236,93), Color.black, "sand", 9);
     public static final TETile SNOW = new TETile('✧', Color.white, Color.lightGray, "snow", 25);
     
     // =========================
@@ -64,6 +64,11 @@ public class Tileset {
     // Player Tile
     // =========================
     public static final TETile AVATAR = new TETile('☺', Color.white, Color.black, "you", 0);
+    
+    // =========================
+    // Chaser Tile
+    // =========================
+    public static final TETile CHASER = new TETile('\u2639', Color.red, Color.black, "chaser", 26); // ☹ as chaser
 }
 
 

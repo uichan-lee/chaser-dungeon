@@ -38,6 +38,16 @@ public class WorldGenerator {
      * World positions of doors that successfully connected to another room.
      */
     private final Set<Point> connectedDoors = new HashSet<>();
+    
+    /**
+     * Chaser position in the world.
+     */
+    private Point chaserPosition = null;
+    
+    /**
+     * Original tile that was under the chaser position (before placing CHASER).
+     */
+    private TETile chaserTileUnder = null;
 
     // Tunable parameters
     private static final int MIN_CORRIDOR_LEN = 3;
@@ -80,8 +90,63 @@ public class WorldGenerator {
 
         // Update door tiles based on whether they're connected
         updateDoorTiles();
+        
+        // Place chaser at a random walkable location (not on avatar)
+        placeChaser(avatarX, avatarY);
 
         return world;
+    }
+    
+    /**
+     * Places the chaser at a random walkable location, avoiding the avatar position.
+     * Ensures minimum distance from player to prevent immediate capture.
+     */
+    private void placeChaser(int avatarX, int avatarY) {
+        // Minimum distance from player (Manhattan distance)
+        final int MIN_DISTANCE = 10;
+        
+        // Collect all walkable floor positions that are at least MIN_DISTANCE away
+        List<Point> walkablePositions = new ArrayList<>();
+        for (int x = 1; x < width - 1; x++) {
+            for (int y = 1; y < height - HUD_HEIGHT; y++) {
+                if (isWalkableTile(world[x][y])) {
+                    Point p = new Point(x, y);
+                    // Don't place chaser on avatar position
+                    if (p.x != avatarX || p.y != avatarY) {
+                        // Calculate Manhattan distance from player
+                        int distance = Math.abs(p.x - avatarX) + Math.abs(p.y - avatarY);
+                        // Only add if distance is at least MIN_DISTANCE
+                        if (distance >= MIN_DISTANCE) {
+                            walkablePositions.add(p);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // If we have walkable positions, randomly choose one
+        if (!walkablePositions.isEmpty()) {
+            int idx = RandomUtils.uniform(rand, walkablePositions.size());
+            chaserPosition = walkablePositions.get(idx);
+            // Save the original tile before placing CHASER
+            chaserTileUnder = world[chaserPosition.x][chaserPosition.y];
+            // Place chaser tile in the world
+            world[chaserPosition.x][chaserPosition.y] = Tileset.CHASER;
+        }
+    }
+    
+    /**
+     * Returns the chaser position, or null if no chaser was placed.
+     */
+    public Point getChaserPosition() {
+        return chaserPosition;
+    }
+    
+    /**
+     * Returns the original tile that was under the chaser position, or null if no chaser was placed.
+     */
+    public TETile getChaserTileUnder() {
+        return chaserTileUnder;
     }
 
     /**
@@ -467,6 +532,11 @@ public class WorldGenerator {
         return true;
     }
 
+    /**
+     * Checks if a tile is walkable.
+     * Walkable tiles are all tiles except unwalkable obstacles.
+     * Must match HUDTest.isWalkableTile and Pathfinder.isWalkableTile for consistency.
+     */
     private boolean isWalkableTile(TETile tile) {
         if (tile == null) {
             return false;
@@ -477,7 +547,14 @@ public class WorldGenerator {
                 && tile != Tileset.WATER
                 && tile != Tileset.LOCKED_DOOR
                 && tile != Tileset.MOUNTAIN
-                && tile != Tileset.TREE;
+                && tile != Tileset.BUSH
+                && tile != Tileset.TREE
+                && tile != Tileset.PORTAL
+                && tile != Tileset.TREASURE
+                && tile != Tileset.STATUE
+                && tile != Tileset.CRATE
+                && tile != Tileset.BOOKSHELF
+                && tile != Tileset.SNOWMAN;
     }
 
     private boolean isBlockingTile(TETile tile) {
@@ -522,7 +599,7 @@ public class WorldGenerator {
                 if (connectedDoors.contains(doorWorld)) {
                     world[doorWorld.x][doorWorld.y] = Tileset.UNLOCKED_DOOR;
                 } else {
-                    world[doorWorld.x][doorWorld.y] = Tileset.LOCKED_DOOR;
+                    world[doorWorld.x][doorWorld.y] = Tileset.WALL;
                 }
             }
         }

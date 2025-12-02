@@ -37,7 +37,7 @@ public class GameLoop {
                 while (!StdDraw.hasNextKeyTyped()) { }
                 char q = Character.toUpperCase(StdDraw.nextKeyTyped());
                 if (q == 'Q') {
-                    SaveLoad.save(world, p);
+                    SaveLoad.save(world, p, null); // No chaser in GameLoop
                     System.exit(0);
                 }
             }

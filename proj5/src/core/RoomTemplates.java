@@ -716,8 +716,7 @@ public final class RoomTemplates {
         fillRing(layout, w / 2, h / 2, 0, 1, Tileset.WALL); // inner wall
         
         // Add decorative elements
-        layout[1][3] = Tileset.STATUE;
-        layout[5][3] = Tileset.STATUE;
+        // Removed STATUE at (1, 3) and (5, 3) - they are directly in front of doors
         layout[3][1] = Tileset.FLOWER;
         layout[3][5] = Tileset.FLOWER;
 

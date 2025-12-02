@@ -1,9 +1,8 @@
 package core;
-import tileengine.Tileset;
 
 import edu.princeton.cs.algs4.StdDraw;
-import tileengine.TERenderer;
 import tileengine.TETile;
+import tileengine.Tileset;
 
 import java.awt.*;
 
@@ -51,7 +50,7 @@ public class Main {
         Point start = findAvatar(world);
         Player p = new Player(start.x, start.y);
 
-        SaveLoad.save(world, p);
+        SaveLoad.save(world, p, null); // No chaser in Main.java
 
         new GameLoop().run(world, p);
     }

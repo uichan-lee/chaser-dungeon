@@ -27,20 +27,17 @@ public class HUDTest {
     private static final int BIG_WIDTH = 110;
     private static final int BIG_HEIGHT = 70;
 
-    private static int SIZE; //0 = Small; 1 = Medium; 2 = Big
+    private static int SIZE; // 0 = Small; 1 = Medium; 2 = Big
 
-    
     private static final int MENU_WIDTH = 56;
     private static final int MENU_HEIGHT = 50;
     private static final int SEED_MAXIMUM_LENGTH = 18;
 
-//    // Tile under Player. Used to render after player move.
-//    private static TETile playerPositionTile = Tileset.FLOOR;
-
     // world renderer
     private static final TERenderer renderer = new TERenderer();
-
-
+    
+    // Flag to track if we're waiting for Q after pressing :
+    private static boolean waitingForQuit = false;
 
     public static void main(String[] args) {
         renderer.initialize(MENU_WIDTH, MENU_HEIGHT);
@@ -59,7 +56,7 @@ public class HUDTest {
      * 3. exit (terminate program)
      */
     private static void mainMenu() {
-        char c = '.';   // input character
+        char c = '.'; // input character
         while (true) {
             if (!StdDraw.hasNextKeyTyped()) {
                 continue;
@@ -109,8 +106,6 @@ public class HUDTest {
         }
     }
 
-
-
     private static void drawTitle() {
         // Title: "CS 61B: BYOW"
         StdDraw.setPenColor(StdDraw.BOOK_LIGHT_BLUE);
@@ -137,8 +132,8 @@ public class HUDTest {
         StdDraw.rectangle(
                 (double) MENU_WIDTH / 2, // x: 28
                 (double) MENU_HEIGHT / 2 - (MENU_HEIGHT * 0.05), // y: 32; Slightly below the center
-                (double) MENU_WIDTH / 2 - (MENU_WIDTH * 0.1),    // halfWidth: 25; 6 empty on both sides
-                (double) MENU_HEIGHT / 2 - (MENU_HEIGHT * 0.1)   // halfHeight: 28
+                (double) MENU_WIDTH / 2 - (MENU_WIDTH * 0.1), // halfWidth: 25; 6 empty on both sides
+                (double) MENU_HEIGHT / 2 - (MENU_HEIGHT * 0.1) // halfHeight: 28
         );
     }
 
@@ -194,7 +189,6 @@ public class HUDTest {
                 StdDraw.show();
             } else { // If c is a number (digit)
 
-
                 sb.append(c);
 
                 // clear area
@@ -223,8 +217,44 @@ public class HUDTest {
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.8, text);
     }
 
+    /**
+     * Loads a saved game from savefile.txt and starts the game loop.
+     * Returns to main menu if no save file exists.
+     */
     private static void loadGame() {
-        // TODO: Implement
+        SaveLoad.SaveState state = SaveLoad.load();
+        if (state == null) {
+            return; // No save file exists, return to menu
+        }
+
+        TETile[][] world = state.world;
+        Player player = state.player;
+        Chaser chaser = state.chaser;
+
+        // Determine world size from loaded world dimensions
+        int width = world.length;
+        int height = world[0].length;
+        
+        // Set SIZE based on loaded world dimensions
+        if (width == SMALL_WIDTH && height == SMALL_HEIGHT) {
+            SIZE = 0;
+        } else if (width == MEDIUM_WIDTH && height == MEDIUM_HEIGHT) {
+            SIZE = 1;
+        } else if (width == BIG_WIDTH && height == BIG_HEIGHT) {
+            SIZE = 2;
+        } else {
+            // Unknown size, default to medium
+            SIZE = 1;
+        }
+
+        // Initialize renderer with loaded world dimensions
+        renderer.initialize(width, height);
+
+        // Render the loaded world
+        renderer.renderFrame(world);
+
+        // Start game loop with loaded world, player, and chaser
+        runGameLoop(world, player, chaser);
     }
 
     /**
@@ -244,7 +274,7 @@ public class HUDTest {
         StdDraw.setPenColor(StdDraw.YELLOW);
         StdDraw.setFont(MENU_FONT);
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.7, "Seed: " + seed);
-        
+
         StdDraw.setPenColor(StdDraw.WHITE);
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.5, "Press Y to confirm");
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.3, "Press N to cancel");
@@ -256,7 +286,7 @@ public class HUDTest {
                 continue;
             }
             char c = StdDraw.nextKeyTyped();
-            
+
             if (c == 'y' || c == 'Y') {
                 return true;
             } else if (c == 'n' || c == 'N') {
@@ -265,7 +295,7 @@ public class HUDTest {
                 // Clear warning area
                 StdDraw.setPenColor(StdDraw.BLACK);
                 StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.25, (double) MENU_WIDTH * 0.3, 2);
-                
+
                 // Print invalid message
                 StdDraw.setPenColor(StdDraw.ORANGE);
                 StdDraw.setFont(SMALL_WARNING_FONT);
@@ -291,7 +321,7 @@ public class HUDTest {
         StdDraw.setPenColor(StdDraw.WHITE);
         StdDraw.setFont(MENU_FONT);
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.75, "Select World Size");
-        
+
         StdDraw.setFont(SEED_FONT);
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.6, "(S) Small: " + SMALL_WIDTH + "x" + SMALL_HEIGHT);
 
@@ -300,12 +330,12 @@ public class HUDTest {
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.4, "(B) Big: " + BIG_WIDTH + "x" + BIG_HEIGHT);
 
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.25, "(N) Cancel");
-        
+
         StdDraw.setFont(MINI_FONT);
         StdDraw.setPenColor(StdDraw.GRAY);
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.47, "Recommended for most devices");
         StdDraw.text((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.37, "Recommended for large monitors");
-        
+
         StdDraw.show();
 
         // Wait for S, M, B, or N input
@@ -314,23 +344,23 @@ public class HUDTest {
                 continue;
             }
             char c = StdDraw.nextKeyTyped();
-            
+
             if (c == 's' || c == 'S') {
                 SIZE = 0;
-                return new int[]{SMALL_WIDTH, SMALL_HEIGHT};
+                return new int[] { SMALL_WIDTH, SMALL_HEIGHT };
             } else if (c == 'm' || c == 'M') {
                 SIZE = 1;
-                return new int[]{MEDIUM_WIDTH, MEDIUM_HEIGHT};
+                return new int[] { MEDIUM_WIDTH, MEDIUM_HEIGHT };
             } else if (c == 'b' || c == 'B') {
                 SIZE = 2;
-                return new int[]{BIG_WIDTH, BIG_HEIGHT};
+                return new int[] { BIG_WIDTH, BIG_HEIGHT };
             } else if (c == 'n' || c == 'N') {
                 return null;
             } else {
                 // Clear warning area
                 StdDraw.setPenColor(StdDraw.BLACK);
                 StdDraw.filledRectangle((double) MENU_WIDTH / 2, MENU_HEIGHT * 0.15, (double) MENU_WIDTH * 0.3, 2);
-                
+
                 // Print invalid message
                 StdDraw.setPenColor(StdDraw.ORANGE);
                 StdDraw.setFont(SMALL_WARNING_FONT);
@@ -344,24 +374,38 @@ public class HUDTest {
      * Generates a world using the given seed and renders it.
      * After rendering,
      * 
-     * @param seed the seed for world generation
-     * @param width the width of the world
+     * @param seed   the seed for world generation
+     * @param width  the width of the world
      * @param height the height of the world
      */
     private static void generateAndRenderWorld(long seed, int width, int height) {
         renderer.initialize(width, height);
-        
+
         WorldGenerator gen = new WorldGenerator(width, height, seed);
         TETile[][] world = gen.generate();
-        
+
         // Find avatar position and create Player
         Player player = findPlayer(world);
         
+        // Create chaser at position from WorldGenerator
+        Chaser chaser = null;
+        java.awt.Point chaserPos = gen.getChaserPosition();
+        if (chaserPos != null) {
+            chaser = new Chaser(chaserPos.x, chaserPos.y);
+            // Initialize tileUnderChaser from WorldGenerator
+            TETile tileUnder = gen.getChaserTileUnder();
+            if (tileUnder != null) {
+                chaser.tileUnderChaser = tileUnder;
+            } else {
+                chaser.tileUnderChaser = Tileset.FLOOR; // Fallback
+            }
+        }
+
         renderer.renderFrame(world);
 
-        runGameLoop(world, player);
+        runGameLoop(world, player, chaser);
     }
-    
+
     /**
      * Finds the avatar in the world and creates a Player object at that position.
      */
@@ -376,14 +420,15 @@ public class HUDTest {
         throw new RuntimeException("Avatar not found in world");
     }
 
-
     /**
-     * Main game loop: handles player movement and updates HUD based on mouse position
+     * Main game loop: handles player movement and updates HUD based on mouse
+     * position
      *
-     * @param world the world tile map
+     * @param world  the world tile map
      * @param player the player object
+     * @param chaser the chaser entity (can be null)
      */
-    private static void runGameLoop(TETile[][] world, Player player) {
+    private static void runGameLoop(TETile[][] world, Player player, Chaser chaser) {
         int worldWidth;
         int worldHeight;
 
@@ -398,96 +443,513 @@ public class HUDTest {
             worldHeight = BIG_HEIGHT;
         }
 
+        // Reset quit waiting flag
+        waitingForQuit = false;
+        
         // Initial HUD background
         clearHUDArea(worldWidth, worldHeight);
         StdDraw.show();
 
-        // Main loop: handle input, update world, render, and update HUD
+        // Main loop: handle input and update HUD based on mouse position
         while (true) {
-            // Handle keyboard input for player movement
-            handleInput(world, player);
+            boolean playerMoved = false;
             
-            // Clear screen and render everything in one batch
-            StdDraw.clear(StdDraw.BLACK);
+            // If waiting for Q after pressing :, check for Q key first
+            if (waitingForQuit) {
+                if (StdDraw.hasNextKeyTyped()) {
+                    char q = Character.toUpperCase(StdDraw.nextKeyTyped());
+                    if (q == 'Q') {
+                        SaveLoad.save(world, player, chaser);
+                        System.exit(0);
+                    } else {
+                        // If not Q, cancel quit mode and process the key normally
+                        waitingForQuit = false;
+                        // Process the key that was pressed
+                        playerMoved = processKeyAfterQuitCancel(world, player, chaser, q);
+                    }
+                }
+            } else {
+                // Handle keyboard input for player movement
+                playerMoved = handleInput(world, player, chaser);
+            }
             
-            // Render the world tiles (without clearing/showing)
-            renderer.drawTiles(world);
+            // Update chaser path for display (always use current player position)
+            if (chaser != null) {
+                // Calculate path from chaser to current player position for display
+                chaser.path = Pathfinder.findPath(chaser.pos, player.pos, world);
+            }
             
-            // Update HUD based on mouse position (without showing)
-            updateHUDWithMouse(world, worldWidth, worldHeight, false);
+            // Check for collision - handle cases where player and chaser swap positions
+            if (chaser != null && playerMoved) {
+                // Check if player moved to chaser's current position
+                if (player.pos.equals(chaser.pos)) {
+                    showGameOver(worldWidth, worldHeight);
+                    System.exit(0);
+                }
+                
+                // Move chaser (this will update chaser.previousPos)
+                moveChaser(chaser, player, world);
+                
+                // Check if chaser caught the player after moving
+                if (chaser.pos.equals(player.pos)) {
+                    showGameOver(worldWidth, worldHeight);
+                    System.exit(0);
+                }
+                
+                // Check if they swapped positions (passed through each other)
+                // Player's previous position = Chaser's current position AND
+                // Chaser's previous position = Player's current position
+                if (player.previousPos.equals(chaser.pos) && 
+                    chaser.previousPos.equals(player.pos)) {
+                    showGameOver(worldWidth, worldHeight);
+                    System.exit(0);
+                }
+            }
             
-            // Show everything at once
-            StdDraw.show();
+            // Also check if they're on the same tile (in case chaser moves without player moving)
+            if (chaser != null && chaser.pos.equals(player.pos)) {
+                showGameOver(worldWidth, worldHeight);
+                System.exit(0);
+            }
+
+            // Update HUD based on mouse position
+            updateHUDWithMouse(world, worldWidth, worldHeight, player);
             
+            // Render chaser and path
+            if (chaser != null) {
+                renderChaserAndPath(chaser, world);
+            }
+
             StdDraw.pause(30); // ~30 FPS, avoids busy-waiting
-        }
-    }
-    
-    /**
-     * Handles keyboard input for player movement (W/A/S/D).
-     * Based on GameLoop.handleInput logic.
-     */
-    private static void handleInput(TETile[][] world, Player player) {
-        if (!StdDraw.hasNextKeyTyped()) {
-            return;
-        }
-        
-        char c = Character.toUpperCase(StdDraw.nextKeyTyped());
-        switch (c) {
-            case 'W':
-                movePlayer(player, Direction.UP, world);
-                break;
-            case 'A':
-                movePlayer(player, Direction.LEFT, world);
-                break;
-            case 'S':
-                movePlayer(player, Direction.DOWN, world);
-                break;
-            case 'D':
-                movePlayer(player, Direction.RIGHT, world);
-                break;
-        }
-    }
-    
-    /**
-     * Moves the player in the specified direction if the target tile is walkable.
-     * Based on GameLoop.move logic.
-     */
-    private static void movePlayer(Player player, Direction dir, TETile[][] world) {
-        player.facing = dir;
-        
-        int nx = player.pos.x + dir.dx;
-        int ny = player.pos.y + dir.dy;
-        
-        // Check bounds
-        if (nx < 0 || nx >= world.length || ny < 0 || ny >= world[0].length) {
-            return;
-        }
-        
-        // Allowed floor types (same as GameLoop.move)
-        if (world[nx][ny].equals(Tileset.FLOOR) || world[nx][ny].equals(Tileset.UNLOCKED_DOOR)) {
-            // Clear old location
-            world[player.pos.x][player.pos.y] = Tileset.FLOOR;
-            
-            // Move player
-            player.pos = new java.awt.Point(nx, ny);
-            
-            // Place avatar tile
-            world[nx][ny] = Tileset.AVATAR;
         }
     }
 
     /**
-     * Draws the HUD area and shows information about the tile currently under the mouse cursor (if any).
+     * Processes a key press after quitting was cancelled.
+     * This allows normal key processing even after : was pressed.
      * 
-     * @param world the world tile map
-     * @param worldWidth width of the world
-     * @param worldHeight height of the world
-     * @param showNow if true, calls StdDraw.show() at the end; if false, just draws without showing
+     * @return true if player actually moved, false otherwise
      */
-    private static void updateHUDWithMouse(TETile[][] world, int worldWidth, int worldHeight, boolean showNow) {
+    private static boolean processKeyAfterQuitCancel(TETile[][] world, Player player, Chaser chaser, char c) {
+        switch (c) {
+            case 'W':
+                return movePlayer(player, Direction.UP, world);
+            case 'A':
+                return movePlayer(player, Direction.LEFT, world);
+            case 'S':
+                return movePlayer(player, Direction.DOWN, world);
+            case 'D':
+                return movePlayer(player, Direction.RIGHT, world);
+            case 'P':
+                // Toggle path display
+                if (chaser != null) {
+                    chaser.showPath = !chaser.showPath;
+                }
+                return false;
+            case 'I':
+                // Interact with tiles (open treasure, unlock doors, etc.)
+                interact(player, world);
+                return false;
+            case ' ':
+                // Push ability (밀쳐내기) - push chaser away
+                if (chaser != null) {
+                    pushChaser(chaser, player, world);
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
+    
+    /**
+     * Handles keyboard input for player movement (W/A/S/D), save/quit (:Q), 
+     * path toggle (P), interact (I), and push ability (Space).
+     * 
+     * @return true if player actually moved, false otherwise
+     */
+    private static boolean handleInput(TETile[][] world, Player player, Chaser chaser) {
+        if (!StdDraw.hasNextKeyTyped()) {
+            return false;
+        }
+
+        char c = Character.toUpperCase(StdDraw.nextKeyTyped());
+        switch (c) {
+            case 'W':
+                return movePlayer(player, Direction.UP, world);
+            case 'A':
+                return movePlayer(player, Direction.LEFT, world);
+            case 'S':
+                return movePlayer(player, Direction.DOWN, world);
+            case 'D':
+                return movePlayer(player, Direction.RIGHT, world);
+            case ':':
+                // Set flag to show quit message and wait for Q
+                waitingForQuit = true;
+                return false;
+            case 'Q':
+                // In world mode, Q alone does nothing
+                return false;
+            case 'P':
+                // Toggle path display
+                if (chaser != null) {
+                    chaser.showPath = !chaser.showPath;
+                }
+                return false;
+            case 'I':
+                // Interact with tiles (open treasure, unlock doors, etc.)
+                interact(player, world);
+                return false;
+            case ' ':
+                // Push ability (밀쳐내기) - push chaser away
+                if (chaser != null) {
+                    pushChaser(chaser, player, world);
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Moves the player in the specified direction if the target tile is walkable.
+     * Only redraws the affected tiles without re-rendering the entire world.
+     * 
+     * @param player the player to move
+     * @param dir the direction to move
+     * @param world the world tile map
+     * @return true if player actually moved, false otherwise
+     */
+    private static boolean movePlayer(Player player, Direction dir, TETile[][] world) {
+        player.facing = dir;
+
+        int nx = player.pos.x + dir.dx;
+        int ny = player.pos.y + dir.dy;
+
+        // Check bounds
+        if (nx < 0 || nx >= world.length || ny < 0 || ny >= world[0].length) {
+            return false;
+        }
+
+        // Check if target tile is walkable (matches WorldGenerator.isWalkableTile
+        // logic)
+        if (isWalkableTile(world[nx][ny])) {
+            // Reset font to tile rendering font before redrawing tiles
+            // (HUD may have changed the font)
+            renderer.resetFont();
+            
+            // Save previous position before moving (for chaser to track)
+            player.previousPos = new java.awt.Point(player.pos.x, player.pos.y);
+            
+            // Restore old location with the tile that was under the player
+            world[player.pos.x][player.pos.y] = player.tileUnderPlayer;
+            world[player.pos.x][player.pos.y].draw(player.pos.x, player.pos.y);
+
+            // Save the new tile that will be under the player
+            player.tileUnderPlayer = world[nx][ny];
+
+            // Move player
+            player.pos = new java.awt.Point(nx, ny);
+
+            // Place avatar tile and redraw
+            world[nx][ny] = Tileset.AVATAR;
+            world[nx][ny].draw(nx, ny);
+
+            // Show the updated tiles
+            StdDraw.show();
+            return true; // Player actually moved
+        }
+        return false; // Player did not move
+    }
+
+    /**
+     * Moves the chaser one step towards the player using BFS pathfinding.
+     * The chaser tracks the player's previous position (before last move) to avoid
+     * immediately catching up to the player's new position.
+     * Note: The path for display is calculated separately in runGameLoop using current position.
+     * 
+     * @param chaser the chaser to move
+     * @param player the target player
+     * @param world the world tile map
+     */
+    private static void moveChaser(Chaser chaser, Player player, TETile[][] world) {
+        // Find path from chaser to player's previous position (before last move)
+        // This prevents chaser from immediately catching up to player's new position
+        java.util.List<java.awt.Point> path = Pathfinder.findPath(chaser.pos, player.previousPos, world);
+        
+        // If path exists and has at least one step, move chaser
+        if (!path.isEmpty()) {
+            java.awt.Point nextPos = path.get(0);
+            
+            // Check bounds
+            if (nextPos.x >= 0 && nextPos.x < world.length && 
+                nextPos.y >= 0 && nextPos.y < world[0].length) {
+                
+                // Check if target is walkable or passable
+                // Pathfinder allows CHASER and AVATAR to be traversed, so we allow them too
+                TETile nextTile = world[nextPos.x][nextPos.y];
+                if (isWalkableTile(nextTile) || 
+                    nextTile.equals(Tileset.AVATAR) ||
+                    nextTile.equals(Tileset.CHASER)) {
+                    
+                    // Reset font before drawing
+                    renderer.resetFont();
+                    
+                    // Save previous position before moving (for collision detection)
+                    chaser.previousPos = new java.awt.Point(chaser.pos.x, chaser.pos.y);
+                    
+                    // Restore old location with the tile that was under the chaser
+                    world[chaser.pos.x][chaser.pos.y] = chaser.tileUnderChaser;
+                    world[chaser.pos.x][chaser.pos.y].draw(chaser.pos.x, chaser.pos.y);
+                    
+                    // Save the new tile that will be under the chaser
+                    chaser.tileUnderChaser = world[nextPos.x][nextPos.y];
+                    
+                    // Move chaser
+                    chaser.pos = nextPos;
+                    
+                    // Place chaser tile (only if not on player)
+                    if (!chaser.pos.equals(player.pos)) {
+                        world[chaser.pos.x][chaser.pos.y] = Tileset.CHASER;
+                        world[chaser.pos.x][chaser.pos.y].draw(chaser.pos.x, chaser.pos.y);
+                    }
+                    
+                    // Show the updated tiles
+                    StdDraw.show();
+                    
+                    // Update path after moving (for next display)
+                    chaser.path = Pathfinder.findPath(chaser.pos, player.pos, world);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Renders the chaser's path as small yellow dots on top of tiles (if path display is enabled).
+     * Clears previous path by redrawing tiles before drawing new path.
+     */
+    private static void renderChaserAndPath(Chaser chaser, TETile[][] world) {
+        // Clear previous path by redrawing tiles
+        if (chaser.previousPath != null && !chaser.previousPath.isEmpty()) {
+            renderer.resetFont();
+            for (java.awt.Point p : chaser.previousPath) {
+                // Redraw the tile to clear the path dot
+                if (p.x >= 0 && p.x < world.length && 
+                    p.y >= 0 && p.y < world[0].length &&
+                    !p.equals(chaser.pos)) {
+                    world[p.x][p.y].draw(p.x, p.y);
+                }
+            }
+        }
+        
+        // Draw new path if path display is enabled
+        if (chaser.showPath && chaser.path != null && !chaser.path.isEmpty()) {
+            StdDraw.setPenColor(new java.awt.Color(255, 165, 0, 200));
+            
+            for (java.awt.Point p : chaser.path) {
+                // Don't draw path on chaser's current position or player position
+                if (!p.equals(chaser.pos) && 
+                    p.x >= 0 && p.x < world.length &&
+                    p.y >= 0 && p.y < world[0].length &&
+                    (world[p.x][p.y] == null || !world[p.x][p.y].equals(Tileset.AVATAR))) {
+                    double centerX = p.x + 0.5;
+                    double centerY = p.y + 0.5;
+                    double dotSize = 0.15;
+                    StdDraw.filledCircle(centerX, centerY, dotSize);
+                }
+            }
+        }
+        
+        // Update previous path for next frame
+        if (chaser.path != null) {
+            chaser.previousPath = new java.util.ArrayList<>(chaser.path);
+        } else {
+            chaser.previousPath = null;
+        }
+        
+        StdDraw.show();
+    }
+    
+    /**
+     * Checks if a tile is walkable.
+     * Walkable tiles are all tiles except unwalkable obstacles.
+     * Must match WorldGenerator.isWalkableTile and Pathfinder.isWalkableTile for consistency.
+     */
+    private static boolean isWalkableTile(TETile tile) {
+        if (tile == null) {
+            return false;
+        }
+        return !tile.equals(Tileset.AVATAR)
+                && !tile.equals(Tileset.WALL)
+                && !tile.equals(Tileset.NOTHING)
+                && !tile.equals(Tileset.WATER)
+                && !tile.equals(Tileset.LOCKED_DOOR)
+                && !tile.equals(Tileset.MOUNTAIN)
+                && !tile.equals(Tileset.BUSH)
+                && !tile.equals(Tileset.TREE)
+                && !tile.equals(Tileset.PORTAL)
+                && !tile.equals(Tileset.TREASURE)
+                && !tile.equals(Tileset.CRATE)
+                && !tile.equals(Tileset.BOOKSHELF)
+                && !tile.equals(Tileset.SNOWMAN)
+                && !tile.equals(Tileset.STATUE);
+    }
+    
+    /**
+     * Interacts with tiles in front of the player.
+     * Opens treasure chests (increases push ability count) and unlocks doors.
+     */
+    private static void interact(Player player, TETile[][] world) {
+        java.awt.Point front = player.frontTile();
+        
+        // Check bounds
+        if (front.x < 0 || front.x >= world.length || 
+            front.y < 0 || front.y >= world[0].length) {
+            return;
+        }
+        
+        TETile frontTile = world[front.x][front.y];
+        
+        // Open treasure chest
+        if (frontTile.equals(Tileset.TREASURE)) {
+            player.pushAbilityCount++;
+            // Replace treasure with floor
+            world[front.x][front.y] = Tileset.FLOOR;
+            renderer.resetFont();
+            world[front.x][front.y].draw(front.x, front.y);
+            StdDraw.show();
+        }
+        
+        // Unlock door
+        if (frontTile.equals(Tileset.LOCKED_DOOR)) {
+            world[front.x][front.y] = Tileset.UNLOCKED_DOOR;
+            renderer.resetFont();
+            world[front.x][front.y].draw(front.x, front.y);
+            StdDraw.show();
+        }
+    }
+    
+    /**
+     * Pushes the chaser away from the player (밀쳐내기).
+     * Only works if chaser is within 2 tiles of the player (24 tiles total).
+     * Pushes chaser up to 3 tiles away in the direction from player to chaser.
+     * Stops early if blocked by a wall or unwalkable tile.
+     */
+    private static void pushChaser(Chaser chaser, Player player, TETile[][] world) {
+        // Check if player has push ability
+        if (player.pushAbilityCount <= 0) {
+            return;
+        }
+        
+        // Calculate relative position
+        int dx = chaser.pos.x - player.pos.x;
+        int dy = chaser.pos.y - player.pos.y;
+        
+        // Check if chaser is within 2 tiles (Chebyshev distance <= 2)
+        // This includes all 24 tiles around the player in a 5x5 square (excluding center)
+        if (Math.max(Math.abs(dx), Math.abs(dy)) > 2 || (dx == 0 && dy == 0)) {
+            return;
+        }
+        
+        // Calculate push direction (from player to chaser)
+        Direction pushDir = null;
+        if (dx > 0 && dy == 0) {
+            pushDir = Direction.RIGHT;
+        } else if (dx < 0 && dy == 0) {
+            pushDir = Direction.LEFT;
+        } else if (dx == 0 && dy > 0) {
+            pushDir = Direction.UP;
+        } else if (dx == 0 && dy < 0) {
+            pushDir = Direction.DOWN;
+        } else {
+            // Diagonal: use the direction with larger absolute value, or prefer horizontal
+            if (Math.abs(dx) >= Math.abs(dy)) {
+                pushDir = dx > 0 ? Direction.RIGHT : Direction.LEFT;
+            } else {
+                pushDir = dy > 0 ? Direction.UP : Direction.DOWN;
+            }
+        }
+        
+        // Try to push up to 3 tiles, stopping if blocked
+        int pushDistance = 0;
+        
+        for (int i = 1; i <= 3; i++) {
+            int nextX = chaser.pos.x + pushDir.dx * i;
+            int nextY = chaser.pos.y + pushDir.dy * i;
+            
+            // Check bounds
+            if (nextX < 0 || nextX >= world.length || 
+                nextY < 0 || nextY >= world[0].length) {
+                break; // Hit boundary, stop pushing
+            }
+            
+            // Check if target position is walkable
+            TETile nextTile = world[nextX][nextY];
+            if (!isWalkableTile(nextTile) && 
+                !nextTile.equals(Tileset.AVATAR) &&
+                !nextTile.equals(Tileset.CHASER)) {
+                break; // Hit wall or obstacle, stop pushing
+            }
+            
+            pushDistance = i;
+        }
+        
+        // If we couldn't push at least 1 tile, don't use the ability
+        if (pushDistance == 0) {
+            return;
+        }
+        
+        // Calculate final target position
+        int targetX = chaser.pos.x + pushDir.dx * pushDistance;
+        int targetY = chaser.pos.y + pushDir.dy * pushDistance;
+        
+        // Use push ability
+        player.pushAbilityCount--;
+        
+        // Reset font before drawing
+        renderer.resetFont();
+        
+        // Restore old location
+        world[chaser.pos.x][chaser.pos.y] = chaser.tileUnderChaser;
+        world[chaser.pos.x][chaser.pos.y].draw(chaser.pos.x, chaser.pos.y);
+        
+        // Save new tile under chaser
+        chaser.tileUnderChaser = world[targetX][targetY];
+        
+        // Save previous position for collision detection
+        chaser.previousPos = new java.awt.Point(chaser.pos.x, chaser.pos.y);
+        
+        // Move chaser
+        chaser.pos = new java.awt.Point(targetX, targetY);
+        
+        // Place chaser tile
+        if (!chaser.pos.equals(player.pos)) {
+            world[chaser.pos.x][chaser.pos.y] = Tileset.CHASER;
+            world[chaser.pos.x][chaser.pos.y].draw(chaser.pos.x, chaser.pos.y);
+        }
+        
+        // Clear chaser's path (will be recalculated on next move)
+        chaser.path = null;
+        
+        StdDraw.show();
+    }
+
+    /**
+     * Clears and redraws the HUD area, then shows information about
+     * the tile currently under the mouse cursor (if any).
+     * Also displays push ability icon on the right side.
+     */
+    private static void updateHUDWithMouse(TETile[][] world, int worldWidth, int worldHeight, Player player) {
         // Redraw HUD background
         clearHUDArea(worldWidth, worldHeight);
+
+        // If waiting for quit confirmation, show quit message
+        if (waitingForQuit) {
+            StdDraw.setPenColor(StdDraw.YELLOW);
+            StdDraw.setFont(HUD_FONT);
+            StdDraw.text(worldWidth / 2.0, worldHeight - 0.9, "Press Q to quit");
+            StdDraw.show();
+            return;
+        }
 
         double mouseX = StdDraw.mouseX();
         double mouseY = StdDraw.mouseY();
@@ -515,10 +977,52 @@ public class HUDTest {
                 }
             }
         }
+        
+        // Draw push ability icon on the right side of HUD
+        drawPushAbilityIcon(worldWidth, worldHeight, player);
 
-        if (showNow) {
-            StdDraw.show();
-        }
+        StdDraw.show();
+    }
+    
+    /**
+     * Displays Game Over message and waits before exiting.
+     */
+    private static void showGameOver(int worldWidth, int worldHeight) {
+        // Clear screen
+        StdDraw.clear(StdDraw.BLACK);
+        
+        // Draw Game Over text
+        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.setFont(TITLE_FONT);
+        StdDraw.text(worldWidth / 2.0, worldHeight / 2.0 + 5, "GAME OVER");
+        
+        // Draw subtitle
+        StdDraw.setPenColor(StdDraw.WHITE);
+        StdDraw.setFont(MENU_FONT);
+        StdDraw.text(worldWidth / 2.0, worldHeight / 2.0 - 5, "Chaser caught you!");
+        
+        StdDraw.show();
+        
+        // Wait a bit before exiting
+        StdDraw.pause(2000);
+    }
+    
+    /**
+     * Draws the push ability icon and count on the right side of the HUD.
+     */
+    private static void drawPushAbilityIcon(int worldWidth, int worldHeight, Player player) {
+        // Draw icon on the right side of HUD
+        double iconX = worldWidth - 2.0;
+        double iconY = worldHeight - 0.9;
+        
+        // Draw push ability icon
+        StdDraw.setPenColor(StdDraw.CYAN);
+        StdDraw.setFont(HUD_FONT);
+        StdDraw.text(iconX, iconY, "⚡"); // Lightning bolt icon for push ability
+        
+        // Draw count below the icon
+        StdDraw.setFont(HUD_TAG_FONT);
+        StdDraw.text(iconX, iconY - 0.6, String.valueOf(player.pushAbilityCount));
     }
 
     private static void clearHUDArea(int worldWidth, int worldHeight) {
@@ -594,7 +1098,8 @@ public class HUDTest {
     }
 
     /**
-     * Returns a short category tag for the given tile, e.g. "dangerous", "interactable",
+     * Returns a short category tag for the given tile, e.g. "dangerous",
+     * "interactable",
      * "unwalkable", etc. Used for the tiny HUD text under the tile name.
      * 
      * Categories follow WorldGenerator's logic for isWalkableTile/isBlockingTile,
