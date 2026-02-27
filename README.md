@@ -11,6 +11,18 @@ The code showcases:
 
 ---
 
+## Screenshots
+
+- **Main menu**
+
+  ![Main menu](images/main_page.png)
+
+- **Generated dungeon example**
+
+  ![Dungeon map example](images/map_example.png)
+
+---
+
 ## Features
 
 - **Seed-based world generation**
