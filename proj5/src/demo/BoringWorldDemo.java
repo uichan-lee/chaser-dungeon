@@ -36,5 +36,4 @@ public class BoringWorldDemo {
         ter.renderFrame(world);
     }
 
-
 }
